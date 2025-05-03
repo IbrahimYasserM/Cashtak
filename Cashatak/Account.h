@@ -13,18 +13,18 @@ protected:
 
 public:
     Account();
-    Account(const string& username, const string& email, 
-            const string& password, const string& accountType);
+    Account(const string& username, const string& email,
+        const string& password, const string& accountType);
     virtual ~Account();
+   
 
-    bool login(const string& username, const string& password);
-    bool registerAccount(const string& username, const string& email, 
-                       const string& password, const string& accountType);
-    void logout();
+    virtual bool login(const string& username, const string& password);
+    virtual bool registerAccount(const string& username, const string& email,
+        const string& password, const string& accountType);
+    virtual void logout();
 
     // Getters
-    string getUsername() const;
-    string getEmail() const;
-    string getAccountType() const;
+    virtual string getUsername() const;
+    virtual string getEmail() const;
+    virtual string getAccountType() const;
 };
-
