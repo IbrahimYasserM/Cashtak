@@ -26,16 +26,18 @@ public:
     ~User();
    
     //getters and setters 
-    double getBalance() const;
     void setBalance(double newBalance,string password);
-    void addBalance(double amount,string password);
-    void editPassword(string userName,string currentPass,string newPass);
-    
-    // Methods to handle transactions and requests
+    double getBalance() const;
+    long long getAccountId() const;
     vector<Transaction>& getHistoryTransactions() const;
     vector<Request>& getPendingIncomingRequests() const;
     vector<Request>& getPendingOutgoingRequests() const;
+    void addBalance(double amount,string password);
+    
+	// Methods to handle user account
+    void editPassword(string userName,string currentPass,string newPass);
+
+    // Methods to handle transactions and requests
     void requestMoney(Request moneyRequest);
     void sendMoney(Transaction sendMoney);
-
-};
+	};
