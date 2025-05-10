@@ -102,16 +102,11 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Admin.cpp" />
-    <ClCompile Include="Business.cpp" />
-    <ClCompile Include="Database.cpp" />
-    <ClCompile Include="Event.cpp" />
-    <ClCompile Include="FileManager.cpp" />
-    <ClCompile Include="Notification.cpp" />
-    <ClCompile Include="NotificationManager.cpp" />
-    <ClCompile Include="Request.cpp" />
-    <ClCompile Include="Transaction.cpp" />
-    <ClCompile Include="User.cpp" />
+    <QtRcc Include="Cashatak.qrc" />
+    <QtUic Include="Cashatak.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Account.h" />
     <ClInclude Include="Admin.h" />
     <ClInclude Include="Business.h" />
     <ClInclude Include="Database.h" />
@@ -120,20 +115,29 @@
     <ClInclude Include="Notification.h" />
     <ClInclude Include="NotificationManager.h" />
     <ClInclude Include="Request.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Transaction.h" />
     <ClInclude Include="User.h" />
-    <QtRcc Include="Cashatak.qrc" />
-    <QtUic Include="Cashatak.ui" />
     <QtMoc Include="Cashatak.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="Account.cpp" />
+    <ClCompile Include="Admin.cpp" />
+    <ClCompile Include="Business.cpp" />
     <ClCompile Include="Cashatak.cpp" />
+    <ClCompile Include="Database.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClInclude Include="Account.h" />
-    <ClInclude Include="stdafx.h" />
+    <ClCompile Include="Notification.cpp" />
+    <ClCompile Include="NotificationManager.cpp" />
+    <ClCompile Include="Request.cpp" />
     <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Transaction.cpp" />
+    <ClCompile Include="User.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
