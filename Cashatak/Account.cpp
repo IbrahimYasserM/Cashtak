@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Account.h"
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <functional> // For std::hash
@@ -59,7 +58,7 @@ bool Account::registerAccount(const string& username, const string& email,
 void Account::logout()
 {
     // In a real implementation, this would clear session data or authentication tokens
-    cout << "User " << username << " logged out" << endl;
+    //cout << "User " << username << " logged out" << endl;
 }
 
 

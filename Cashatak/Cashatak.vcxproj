@@ -108,7 +108,6 @@
   <ItemGroup>
     <ClInclude Include="Account.h" />
     <ClInclude Include="Admin.h" />
-    <ClInclude Include="Business.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="FileManager.h" />
@@ -123,7 +122,6 @@
   <ItemGroup>
     <ClCompile Include="Account.cpp" />
     <ClCompile Include="Admin.cpp" />
-    <ClCompile Include="Business.cpp" />
     <ClCompile Include="Cashatak.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="Event.cpp" />

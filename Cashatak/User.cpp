@@ -28,7 +28,7 @@ void User::setBalance(double newBalance, string password) {
         this->balance = newBalance;
     }
     else {
-        cout << "Incorrect password. Balance not updated." << endl;
+        //cout << "Incorrect password. Balance not updated." << endl;
     }
 }
 
@@ -38,7 +38,7 @@ void User::addBalance(double amount, string password) {
         this->balance += amount;
     }
     else {
-        cout << "Incorrect password. Amount not added." << endl;
+        //cout << "Incorrect password. Amount not added." << endl;
     }
 }
 
@@ -47,10 +47,10 @@ void User::addBalance(double amount, string password) {
 void User::editPassword(string userName, string currentPass, string newPass) {
     if (this->getUsername() == userName && this->hashedPassword == hashPassword(currentPass)) {
         this->hashedPassword = hashPassword(newPass);
-        cout << "Password updated successfully." << endl;
+        //cout << "Password updated successfully." << endl;
     }
     else {
-        cout << "Incorrect username or password. Password not updated." << endl;
+        //cout << "Incorrect username or password. Password not updated." << endl;
     }
 }
 
@@ -90,11 +90,10 @@ void User::sendMoney(Transaction sendMoney) {
         completedTransactions.push_back(sendMoney);
     }
     else {
-        cout << "Insufficient balance to send money." << endl;
+        //cout << "Insufficient balance to send money." << endl;
     }
 }
 
 
 // Destructor
-User::~User() {
-}
+User::~User() = default;
