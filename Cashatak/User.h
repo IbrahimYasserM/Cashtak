@@ -3,6 +3,7 @@
 #include "Transaction.h"
 #include "Business.h"
 #include "Request.h"
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -22,7 +23,7 @@ public:
     User();
     User(const string& username, const string& email,
         const string& password, const string& accountType,
-        double initialBalance = 0.0);
+        double initialBalance=0.0);
     ~User();
    
     //getters and setters 

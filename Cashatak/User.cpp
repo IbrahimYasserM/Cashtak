@@ -1,7 +1,5 @@
+#include <stdafx.h>
 #include "User.h"
-#include <iostream>
-#include <string>
-#include "Account.h"
 
 // Initialize the static account ID counter
 long long User::accountIdCounter = 1;
@@ -16,7 +14,7 @@ User::User()
 // Parameterized constructor
 User::User(const string& username, const string& email,
     const string& password, const string& accountType,
-    double initialBalance=0.0)
+    double initialBalance)
     : Account(username, email, password, accountType), balance(initialBalance)
 {
     accountIdCounter++;

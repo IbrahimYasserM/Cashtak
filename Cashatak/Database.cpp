@@ -4,7 +4,6 @@
 
 
 Database* Database::database = nullptr;
-Database* Database::database = nullptr;
 
 Database::Database() {
    myfile.open("Accounts.txt", std::ios::in | std::ios::out | std::ios::app);
