@@ -4,7 +4,6 @@
 #include "Account.h"
 #include "Admin.h"
 #include "Request.h"
-#include "Business.h"
 #include "Transaction.h"
 #include <map>
 #include <string>
@@ -27,6 +26,5 @@ public:
 	std::vector<Event*> events;
 	User* user = nullptr;
 	Admin* admin = nullptr;
-	Business* business = nullptr;
 };
 

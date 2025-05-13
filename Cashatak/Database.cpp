@@ -30,9 +30,6 @@ Database::~Database() {
 	if (admin) {
 		delete admin;
 	}
-	if (business) {
-		delete business;
-	}
 }
 Database* Database::getInstance() {
 	if (database == nullptr) {
