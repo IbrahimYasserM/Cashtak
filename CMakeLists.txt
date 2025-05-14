@@ -20,47 +20,72 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 # Define the executable
 add_executable(Cashatak)
 
+# Define source file groups
+file(GLOB CORE_SOURCES       LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/core/*.cpp")
+file(GLOB UI_WINDOWS_SOURCES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/windows/*.cpp")
+file(GLOB UI_VIEWS_SOURCES   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/views/*.cpp")
+# According to README.md, you might have sources in src/app/ and its subdirectories:
+# file(GLOB APP_CORE_SOURCES      LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/*.cpp")
+# file(GLOB APP_SERVICES_SOURCES  LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/services/*.cpp")
+# file(GLOB APP_UTILS_SOURCES     LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/utils/*.cpp")
+# And for UI widgets, if they have .cpp files:
+# file(GLOB UI_WIDGETS_SOURCES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/widgets/*.cpp")
+
 # List of source files
 set(PROJECT_SOURCES
     src/main.cpp
-    src/ui/windows/CashatakMainWindow.cpp
-    src/core/Account.cpp
-    src/core/Admin.cpp
-    src/core/Database.cpp
-    src/core/Event.cpp
-    src/core/FileManager.cpp
-    src/core/Notification.cpp
-    src/core/NotificationManager.cpp
-    src/core/PaymentRequest.cpp
-    src/core/Transaction.cpp
-    src/core/User.cpp
     src/stdafx.cpp
+    ${CORE_SOURCES}
+    ${UI_WINDOWS_SOURCES}
+    ${UI_VIEWS_SOURCES}
+    # ${APP_CORE_SOURCES}
+    # ${APP_SERVICES_SOURCES}
+    # ${APP_UTILS_SOURCES}
+    # ${UI_WIDGETS_SOURCES}
 )
+
+# Define header file groups
+file(GLOB CORE_HEADERS       LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/core/*.h")
+file(GLOB UI_WINDOWS_HEADERS LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/windows/*.h")
+file(GLOB UI_VIEWS_HEADERS   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/views/*.h")
+# According to README.md, you might have headers in src/app/ and its subdirectories:
+# file(GLOB APP_CORE_HEADERS      LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/*.h")
+# file(GLOB APP_SERVICES_HEADERS  LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/services/*.h")
+# file(GLOB APP_UTILS_HEADERS     LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/utils/*.h")
+# And for other UI directories:
+# file(GLOB UI_WIDGETS_HEADERS   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/widgets/*.h")
+# file(GLOB UI_MODELS_HEADERS    LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/models/*.h")
+# file(GLOB UI_DELEGATES_HEADERS LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/delegates/*.h")
 
 # List of header files (especially those needing MOC)
 set(PROJECT_HEADERS
-    src/ui/windows/CashatakMainWindow.h
-    src/core/Account.h
-    src/core/Admin.h
-    src/core/Database.h
-    src/core/Event.h
-    src/core/FileManager.h
-    src/core/Notification.h
-    src/core/NotificationManager.h
-    src/core/PaymentRequest.h
-    src/core/Transaction.h
-    src/core/User.h
     src/stdafx.h
+    ${CORE_HEADERS}
+    ${UI_WINDOWS_HEADERS}
+    ${UI_VIEWS_HEADERS}
+    # ${APP_CORE_HEADERS}
+    # ${APP_SERVICES_HEADERS}
+    # ${APP_UTILS_HEADERS}
+    # ${UI_WIDGETS_HEADERS}
+    # ${UI_MODELS_HEADERS}
+    # ${UI_DELEGATES_HEADERS}
 )
 
-# List of UI and QRC files
+# Define UI file groups
+file(GLOB UI_WINDOWS_UI_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/windows/*.ui")
+file(GLOB UI_VIEWS_UI_FILES   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/views/*.ui")
+# According to README.md, you might have UI files in src/ui/widgets:
+# file(GLOB UI_WIDGETS_UI_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/widgets/*.ui")
+
+# List of UI files
 set(PROJECT_UI_FILES
-    src/ui/windows/CashatakMainWindow.ui
+    ${UI_WINDOWS_UI_FILES}
+    ${UI_VIEWS_UI_FILES}
+    # ${UI_WIDGETS_UI_FILES}
 )
 
-set(PROJECT_QRC_FILES
-    src/resources/Cashatak.qrc
-)
+# List of QRC files
+file(GLOB PROJECT_QRC_FILES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/resources/*.qrc")
 
 # Add sources to the target
 target_sources(Cashatak PRIVATE
@@ -77,12 +102,11 @@ target_precompile_headers(Cashatak PRIVATE src/stdafx.h)
 target_link_libraries(Cashatak PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
 
 # Include directories
-# This allows you to use #include "MyClass.h" if MyClass.h is in src/
-# or #include "core/MyCoreClass.h" if it's in src/core/
 target_include_directories(Cashatak PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/windows
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/views
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources
 )
 

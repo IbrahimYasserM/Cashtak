@@ -34,7 +34,7 @@ Cashatak/
 │   │   └── User.h/.cpp
 │   ├── ui/                 # User Interface components (The "View" and "Controller" in MVC/MVP)
 │   │   ├── CMakeLists.txt  # Optional, if UI becomes a separate library
-│   │   ├── windows/        # Main application windows, dialogs
+│   │   ├── views/        # Main application windows, dialogs
 │   │   │   ├── CashatakMainWindow.h/.cpp/.ui  (Example: Your Cashatak.h/.cpp/.ui would go here)
 │   │   │   └── SettingsDialog.h/.cpp/.ui
 │   │   ├── widgets/        # Reusable custom UI widgets
