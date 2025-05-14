@@ -2,14 +2,14 @@
 #include <string>
 #include "Event.h"
 
-class Request : public Event
+class PaymentRequest : public Event
 {
 private:
     std::string message;
 
 public:
     // Constructor
-    Request(int id, double amount, const std::string& sender,
+    PaymentRequest(int id, double amount, const std::string& sender,
            const std::string& recipient, const std::string& status,
            const std::string& message);
 

@@ -3,7 +3,7 @@
 #include "Event.h"
 #include "Account.h"
 #include "Admin.h"
-#include "Request.h"
+#include "PaymentRequest.h"
 #include "Transaction.h"
 #include <map>
 #include <string>

@@ -62,12 +62,12 @@ vector<Transaction>& User::getHistoryTransactions() const {
     return const_cast<vector<Transaction>&>(completedTransactions);
 }
 
-vector<Request>& User::getPendingIncomingRequests() const {
-    return const_cast<vector<Request>&>(pendingIncomingRequests);
+vector<PaymentRequest>& User::getPendingIncomingRequests() const {
+    return const_cast<vector<PaymentRequest>&>(pendingIncomingRequests);
 }
 
-vector<Request>& User::getPendingOutgoingRequests() const {
-    return const_cast<vector<Request>&>(pendingOutgoingRequests);
+vector<PaymentRequest>& User::getPendingOutgoingRequests() const {
+    return const_cast<vector<PaymentRequest>&>(pendingOutgoingRequests);
 }
 double User::getBalance() const {
     return balance;
@@ -80,7 +80,7 @@ long long User::getAccountId() const {
 
 
 //Handle requests and transactions
-void User::requestMoney(Request moneyRequest) {
+void User::requestMoney(PaymentRequest moneyRequest) {
     pendingOutgoingRequests.push_back(moneyRequest);
 }
 

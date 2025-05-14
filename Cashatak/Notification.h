@@ -1,6 +1,7 @@
 #pragma once
 #include "Transaction.h"
-#include "Request.h"
+#include "PaymentRequest.h"
+
 class Notification
 {
 	std::string title, message;
@@ -8,7 +9,7 @@ class Notification
 public:
 	Notification();
 	Notification(const Transaction);
-	Notification(const Request);
+	Notification(const PaymentRequest);
 	~Notification();
 	void display();
 };

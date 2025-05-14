@@ -6,7 +6,7 @@ Notification::Notification(const Transaction transaction) {
 	message = transaction.getSender() + " sent you " + std::to_string(transaction.getAmount()) + "$";
 	date = transaction.getDate();
 };
-Notification::Notification(const Request request) {
+Notification::Notification(const PaymentRequest request) {
 	title = "You received a request";
 //	message = request.getSender() + " requested " + std::to_string(request.getAmount()) + "$";
 //	date = request.getDate();

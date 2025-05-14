@@ -1,7 +1,7 @@
 #pragma once
 #include "Account.h"
 #include "Transaction.h"
-#include "Request.h"
+#include "PaymentRequest.h"
 #include <string>
 #include <vector>
 
@@ -13,8 +13,8 @@ private:
     static long long accountIdCounter;   // Static counter for generating unique IDs
     double balance;
     vector<Transaction> completedTransactions;
-    vector<Request> pendingIncomingRequests;  // Pending requests that other users request it from me 
-    vector<Request> pendingOutgoingRequests;  // Pending requests that I request from other users
+    vector<PaymentRequest> pendingIncomingRequests;  // Pending requests that other users request it from me 
+    vector<PaymentRequest> pendingOutgoingRequests;  // Pending requests that I request from other users
 
 public:
     // Constructors
@@ -29,14 +29,14 @@ public:
     double getBalance() const;
     long long getAccountId() const;
     vector<Transaction>& getHistoryTransactions() const;
-    vector<Request>& getPendingIncomingRequests() const;
-    vector<Request>& getPendingOutgoingRequests() const;
+    vector<PaymentRequest>& getPendingIncomingRequests() const;
+    vector<PaymentRequest>& getPendingOutgoingRequests() const;
     void addBalance(double amount,string password);
     
 	// Methods to handle user account
     void editPassword(string userName,string currentPass,string newPass);
 
     // Methods to handle transactions and requests
-    void requestMoney(Request moneyRequest);
+    void requestMoney(PaymentRequest moneyRequest);
     void sendMoney(Transaction sendMoney);
 	};
