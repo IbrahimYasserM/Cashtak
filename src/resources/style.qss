@@ -1,0 +1,83 @@
+/* Global Styles */
+QWidget {
+    background-color: #F5F5F5; /* Off-white */
+    color: #333333; /* Default dark text color for contrast */
+}
+
+QPushButton {
+    background-color: #4CAF50; /* Good Green */
+    color: white;
+    border: 1px solid #3e8e41; /* Slightly darker green border */
+    padding: 6px 12px;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 4px; /* Rounded corners */
+    min-height: 20px;
+    min-width: 60px;
+}
+
+QPushButton:hover {
+    background-color: #45a049; /* Darker Green */
+}
+
+QPushButton:pressed {
+    background-color: #3e8e41; /* Even Darker Green */
+}
+
+/* Keep input fields and some other views typically white for clarity */
+QLineEdit, QTextEdit, QPlainTextEdit, QSpinBox, QDoubleSpinBox, QListView, QTreeView, QTableView {
+    background-color: white;
+    border: 1px solid #CCCCCC; /* Light grey border */
+    border-radius: 3px;
+    padding: 4px;
+}
+
+/* Styling for labels to ensure they use the default text color */
+QLabel {
+    background-color: transparent; /* Ensure labels don't get the QWidget background if overridden by parent */
+    color: #333333;
+}
+
+/* Style for the "Create Account" button on LoginPage to look like a link */
+QPushButton#pushButtonGoToRegister {
+    background-color: transparent;
+    color: #4CAF50; /* Primary green for link color */
+    border: none;
+    padding: 2px;
+    text-decoration: underline;
+    font-size: 12px; /* Adjust as needed */
+    min-height: 0; /* Override global QPushButton style */
+    min-width: 0;  /* Override global QPushButton style */
+}
+
+QPushButton#pushButtonGoToRegister:hover {
+    color: #3e8e41; /* Darker green on hover */
+    text-decoration: underline;
+}
+
+QPushButton#pushButtonGoToRegister:pressed {
+    color: #336735; /* Even darker green for pressed state */
+    text-decoration: underline;
+}
+
+/* Style for the "Already have an account? Login" button on RegisterPage to look like a link */
+QPushButton#pushButtonGoToLogin {
+    background-color: transparent;
+    color: #4CAF50; /* Primary green for link color */
+    border: none;
+    padding: 2px;
+    text-decoration: underline;
+    font-size: 12px; /* Adjust as needed */
+    min-height: 0; /* Override global QPushButton style */
+    min-width: 0;  /* Override global QPushButton style */
+}
+
+QPushButton#pushButtonGoToLogin:hover {
+    color: #3e8e41; /* Darker green on hover */
+    text-decoration: underline;
+}
+
+QPushButton#pushButtonGoToLogin:pressed {
+    color: #336735; /* Even darker green for pressed state */
+    text-decoration: underline;
+} 
