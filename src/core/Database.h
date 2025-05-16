@@ -22,8 +22,8 @@ private:
 	std::vector<Transaction*> transactions;
 	User* user = nullptr;
 	Admin* admin = nullptr;
-	std::string filePath = "../../../../src/resources/Data/";
-	std::vector<std::string> fileNames = { "Admins.txt","CompletedTransactions.txt", "Users.txt" };
+	std::string filePath = "src/resources/Data/";
+	std::vector<std::string> fileNames = { "Admins.txt", "Users.txt","CompletedTransactions.txt" };
 
 public:
 	~Database();
