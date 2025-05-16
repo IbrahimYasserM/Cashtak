@@ -76,12 +76,12 @@ std::vector<std::string> AdminPage::getAllUsernames()
     std::vector<std::string> usernames;
     Database* db = Database::getInstance();
     
-    // This is a placeholder - in a real implementation,
-    // the Database class would have a method to retrieve all usernames
-    // For now, we'll use some dummy data
-    usernames.push_back("user1");
-    usernames.push_back("user2");
-    usernames.push_back("user3");
+    // Get all accounts from database and filter users
+    for (const auto& [username, account] : db->getAccounts()) {
+        if (account && account->getAccountType() == "User") {
+            usernames.push_back(username);
+        }
+    }
     
     return usernames;
 }
@@ -263,21 +263,33 @@ void AdminPage::on_pushButtonAddUser_clicked()
             return;
         }
         
+        // Check if username already exists
+        Database* db = Database::getInstance();
+        if (db->getAccount(username.toStdString())) {
+            QMessageBox::warning(this, "Username Taken", "This username is already taken. Please choose another one.");
+            return;
+        }
+        
         if (admin) {
+            // Let the admin handle user creation
             bool success = admin->addUser(username.toStdString(), email.toStdString(), 
                                          password.toStdString(), "User");
             if (success) {
-                // Add the user to the database
-                Database* db = Database::getInstance();
-                User* newUser = new User(username.toStdString(), email.toStdString(), 
-                                        password.toStdString(), balance);
-                db->addAccount(newUser);
+                // Set the balance for the new user
+                User* newUser = dynamic_cast<User*>(db->getAccount(username.toStdString()));
+                if (newUser) {
+                    // Use an empty password since we're setting directly after creation
+                    newUser->setBalanceDirectly(balance);
+                    db->saveToFiles(); // Save changes to disk
+                }
                 
                 QMessageBox::information(this, "Success", "User added successfully!");
                 refreshUserTable();
             } else {
-                QMessageBox::warning(this, "Error", "Failed to add user.");
+                QMessageBox::warning(this, "Error", "Failed to add user. The username may already exist.");
             }
+        } else {
+            QMessageBox::warning(this, "Error", "Admin privileges required to add users.");
         }
     }
-} 
+}
