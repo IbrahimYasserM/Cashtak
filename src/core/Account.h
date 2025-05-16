@@ -3,6 +3,8 @@
 
 using namespace std;
 
+class Database; // Forward declaration
+
 class Account
 {
 protected:
@@ -24,4 +26,7 @@ public:
     virtual string getEmail() const;
     virtual string getAccountType() const;
 	virtual string getHashedPassword() const;
-   };
+
+    // Make Database a friend class so it can directly access protected members
+    friend class Database;
+};

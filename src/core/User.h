@@ -42,4 +42,12 @@ public:
     void addPendingIncomingRequest(PaymentRequest request);
     void addPendingOutgoingRequest(PaymentRequest request);
 	void addTransaction(Transaction* transaction);
+
+    // Add this to allow Database to directly set balance
+    void setBalanceDirectly(double newBalance) {
+        balance = newBalance;
+    }
+    
+    // Make Database class a friend so it can access protected members
+    friend class Database;
 };

@@ -53,24 +53,38 @@ Database::Database() {
         if (fileName == "Admins.txt") {
             while (std::getline(myfile, line)) {
                 std::istringstream iss(line);
-                std::string username, email, password;
-                if (!(iss >> username >> email >> password)) {
+                std::string username, email, hashedPassword;
+                if (!(iss >> username >> email >> hashedPassword)) {
                     throw std::runtime_error("No enough paramaters in " + fileName);
                 }
-                Admin* account = new Admin(username, email, password);
+                
+                // Important: use the hashed password directly - don't hash it again
+                Admin* account = new Admin();
+                account->username = username;
+                account->email = email;
+                account->hashedPassword = hashedPassword; // Use hashed password as-is
+                account->accountType = "Admin";
+                
                 accounts[username] = account;
             }
         }
         else if (fileName == "Users.txt") {
             while (std::getline(myfile, line)) {
                 std::istringstream iss(line);
-                std::string username, email, password;
+                std::string username, email, hashedPassword;
                 double balance;
-                if (!(iss >> username >> email >> password >> balance)) {
+                if (!(iss >> username >> email >> hashedPassword >> balance)) {
                     throw std::runtime_error("No enough paramaters in " + fileName); // error
                 }
-                User* account = new User(username, email, password, balance);
-
+                
+                // Important: use the hashed password directly - don't hash it again
+                User* account = new User();
+                account->username = username;
+                account->email = email;
+                account->hashedPassword = hashedPassword; // Use hashed password as-is
+                account->accountType = "User";
+                account->setBalance(balance, ""); // Set balance directly
+                
                 accounts[username] = account;
             }
         }
@@ -381,7 +395,7 @@ bool Database::saveToFiles() {
                 if (user) {
                     userFile << user->getUsername() << " "
                         << user->getEmail() << " "
-                        << user->getHashedPassword() << " "
+                        << user->getHashedPassword() << " " // Use the stored hash directly
                         << user->getBalance() << std::endl;
                 }
             }
