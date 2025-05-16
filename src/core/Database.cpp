@@ -10,7 +10,7 @@ Database* Database::database = nullptr;
 Database::Database() {
     // Resolve the path relative to the application's directory
     QString appPath = QCoreApplication::applicationDirPath();
-    QString resolvedPath = QDir(appPath).filePath("../../../src/resources/Data/");
+    QString resolvedPath = QDir(appPath).filePath("../../src/resources/Data/");
     filePath = resolvedPath.toStdString();
     
     std::cout << "Using data path: " << filePath << std::endl;
