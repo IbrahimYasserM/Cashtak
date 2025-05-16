@@ -60,27 +60,37 @@
       <widget class="QLineEdit" name="lineEditUsername"/>
      </item>
      <item row="1" column="0">
+      <widget class="QLabel" name="labelEmail">
+       <property name="text">
+        <string>Email:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="lineEditEmail"/>
+     </item>
+     <item row="2" column="0">
       <widget class="QLabel" name="labelPassword">
        <property name="text">
         <string>Password:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <widget class="QLineEdit" name="lineEditPassword">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="labelConfirmPassword">
        <property name="text">
         <string>Confirm Password:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="lineEditConfirmPassword">
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>

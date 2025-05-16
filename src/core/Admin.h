@@ -1,10 +1,11 @@
 #pragma once
 #include "Account.h"
 #include <vector>
-#include "admin.h"
 #include "User.h"
 
 using namespace std;
+
+class Event; // Forward declaration
 
 class Admin : public Account
 {

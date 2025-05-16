@@ -107,7 +107,10 @@ Database::Database() {
 }
 
 Database::~Database() {
+    std::cout << "Database destructor called. Starting to write files..." << std::endl;
+    
     // Write Admins
+    std::cout << "Attempting to write to: " << (filePath + "Admins.txt") << std::endl;
     std::ofstream adminFile(filePath + "Admins.txt", std::ios::out);
     if (adminFile) {
         for (const auto& [username, account] : accounts) {
@@ -115,12 +118,16 @@ Database::~Database() {
                 adminFile << account->getUsername() << " "
                     << account->getEmail() << " "
                     << account->getHashedPassword() << std::endl;
+                std::cout << "Wrote admin account: " << account->getUsername() << std::endl;
             }
         }
         adminFile.close();
+    } else {
+        std::cerr << "Failed to open Admins.txt for writing!" << std::endl;
     }
 
     // Write Users
+    std::cout << "Attempting to write to: " << (filePath + "Users.txt") << std::endl;
     std::ofstream userFile(filePath + "Users.txt", std::ios::out);
     if (userFile) {
         for (const auto& [username, account] : accounts) {
@@ -131,13 +138,17 @@ Database::~Database() {
                         << user->getEmail() << " "
                         << user->getHashedPassword() << " "
                         << user->getBalance() << std::endl;
+                    std::cout << "Wrote user account: " << user->getUsername() << std::endl;
                 }
             }
         }
         userFile.close();
+    } else {
+        std::cerr << "Failed to open Users.txt for writing!" << std::endl;
     }
 
     // Write Completed Transactions
+    std::cout << "Attempting to write to: " << (filePath + "CompletedTransactions.txt") << std::endl;
     std::ofstream transFile(filePath + "CompletedTransactions.txt", std::ios::out);
     if (transFile) {
         for (const auto& transaction : transactions) {
@@ -147,11 +158,15 @@ Database::~Database() {
                 << transaction->getRecipient() << " "
                 << transaction->getTable() << " "
                 << transaction->getType() << std::endl;
+            std::cout << "Wrote transaction ID: " << transaction->getId() << std::endl;
         }
         transFile.close();
+    } else {
+        std::cerr << "Failed to open CompletedTransactions.txt for writing!" << std::endl;
     }
 
-    // Write Pending Outgoing Requests (unique requests only)
+    // Write Pending Outgoing Requests
+    std::cout << "Attempting to write to: " << (filePath + "pendingOutgoingRequests.txt") << std::endl;
     std::ofstream pendingFile(filePath + "pendingOutgoingRequests.txt", std::ios::out);
     if (pendingFile) {
         std::set<int> writtenRequestIds;
@@ -159,7 +174,6 @@ Database::~Database() {
             if (account->getAccountType() == "User") {
                 User* user = dynamic_cast<User*>(account);
                 if (user) {
-                    // Only write outgoing requests if this user is the sender and the request id hasn't been written
                     for (const auto& req : user->getPendingOutgoingRequests()) {
                         if (writtenRequestIds.insert(req.getId()).second) {
                             pendingFile << req.getId() << " "
@@ -168,27 +182,34 @@ Database::~Database() {
                                 << req.getRecipient() << " "
                                 << req.getStatus() << " "
                                 << req.getMessage() << std::endl;
+                            std::cout << "Wrote pending request ID: " << req.getId() << std::endl;
                         }
                     }
                 }
             }
         }
         pendingFile.close();
+    } else {
+        std::cerr << "Failed to open pendingOutgoingRequests.txt for writing!" << std::endl;
     }
 
+    std::cout << "Cleaning up memory..." << std::endl;
     // Delete all dynamically allocated memory
     for (auto& [username, account] : accounts) {
+        std::cout << "Deleting account: " << username << std::endl;
         delete account;
     }
     accounts.clear();
 
     for (auto& transaction : transactions) {
+        std::cout << "Deleting transaction ID: " << transaction->getId() << std::endl;
         delete transaction;
     }
     transactions.clear();
 
     user = nullptr;
     admin = nullptr;
+    std::cout << "Database destructor completed." << std::endl;
 }
 
 void Database::createDummyData() {
