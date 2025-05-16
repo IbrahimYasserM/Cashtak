@@ -31,4 +31,9 @@ void HomePage::on_pushButtonSendMoney_clicked()
 void HomePage::on_pushButtonShowTransactions_clicked()
 {
     emit navigateToTransactionsHistoryRequested();
+}
+
+void HomePage::on_pushButtonAdmin_clicked()
+{
+    emit navigateToAdminRequested();
 } 

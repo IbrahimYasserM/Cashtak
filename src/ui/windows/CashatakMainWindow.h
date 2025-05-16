@@ -10,6 +10,7 @@ class HomePage;
 class SendPaymentRequestPage;
 class SendMoneyPage;
 class TransactionsHistoryPage;
+class AdminPage;
 
 class CashatakMainWindow : public QMainWindow
 {
@@ -26,6 +27,7 @@ public slots:
     void navigateToSendPaymentRequest();
     void navigateToSendMoney();
     void navigateToTransactionsHistory();
+    void navigateToAdmin();
 
     // Example slot for when login is successful (to be called by controller later)
     // void handleLoginSuccess(const QString& username);
@@ -38,6 +40,7 @@ private:
     SendPaymentRequestPage *m_sendPaymentRequestPage;
     SendMoneyPage *m_sendMoneyPage;
     TransactionsHistoryPage *m_transactionsHistoryPage;
+    AdminPage *m_adminPage;
 
     void setupConnections();
 };

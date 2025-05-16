@@ -21,12 +21,14 @@ signals:
     void navigateToSendPaymentRequestRequested();
     void navigateToSendMoneyRequested();
     void navigateToTransactionsHistoryRequested();
+    void navigateToAdminRequested();
     void logoutRequested(); // Example for a logout button if you add one
 
 private slots:
     void on_pushButtonSendPaymentRequest_clicked();
     void on_pushButtonSendMoney_clicked();
     void on_pushButtonShowTransactions_clicked();
+    void on_pushButtonAdmin_clicked();
     // Add a slot for logout if you add a logout button
 
 private:

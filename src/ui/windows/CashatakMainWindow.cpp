@@ -6,6 +6,7 @@
 #include "../views/SendPaymentRequestPage.h"// Adjusted path
 #include "../views/SendMoneyPage.h"         // Adjusted path
 #include "../views/TransactionsHistoryPage.h"// Adjusted path
+#include "../views/AdminPage.h"            // Added AdminPage
 #include <QVBoxLayout> // For setting layout if main window doesn't have a .ui
 
 CashatakMainWindow::CashatakMainWindow(QWidget *parent)
@@ -19,6 +20,7 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
     m_sendPaymentRequestPage = new SendPaymentRequestPage(this);
     m_sendMoneyPage = new SendMoneyPage(this);
     m_transactionsHistoryPage = new TransactionsHistoryPage(this);
+    m_adminPage = new AdminPage(this);
 
     m_stackedWidget->addWidget(m_loginPage);
     m_stackedWidget->addWidget(m_registerPage);
@@ -26,6 +28,7 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
     m_stackedWidget->addWidget(m_sendPaymentRequestPage);
     m_stackedWidget->addWidget(m_sendMoneyPage);
     m_stackedWidget->addWidget(m_transactionsHistoryPage);
+    m_stackedWidget->addWidget(m_adminPage);
 
     if (!centralWidget()) { // Check if a central widget is already set (e.g. by a .ui file)
         QWidget *centralContainer = new QWidget(this);
@@ -62,6 +65,7 @@ void CashatakMainWindow::setupConnections()
     connect(m_homePage, &HomePage::navigateToSendPaymentRequestRequested, this, &CashatakMainWindow::navigateToSendPaymentRequest);
     connect(m_homePage, &HomePage::navigateToSendMoneyRequested, this, &CashatakMainWindow::navigateToSendMoney);
     connect(m_homePage, &HomePage::navigateToTransactionsHistoryRequested, this, &CashatakMainWindow::navigateToTransactionsHistory);
+    connect(m_homePage, &HomePage::navigateToAdminRequested, this, &CashatakMainWindow::navigateToAdmin);
     // connect(m_homePage, &HomePage::logoutRequested, this, &CashatakMainWindow::navigateToLogin); // Example for logout
 
     // Send Payment Request Page Connections
@@ -72,6 +76,9 @@ void CashatakMainWindow::setupConnections()
 
     // Transactions History Page Connections
     connect(m_transactionsHistoryPage, &TransactionsHistoryPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
+    
+    // Admin Page Connections
+    connect(m_adminPage, &AdminPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
 }
 
 void CashatakMainWindow::navigateToLogin()
@@ -102,4 +109,9 @@ void CashatakMainWindow::navigateToSendMoney()
 void CashatakMainWindow::navigateToTransactionsHistory()
 {
     m_stackedWidget->setCurrentWidget(m_transactionsHistoryPage);
+}
+
+void CashatakMainWindow::navigateToAdmin()
+{
+    m_stackedWidget->setCurrentWidget(m_adminPage);
 }
