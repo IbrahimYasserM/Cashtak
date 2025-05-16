@@ -3,6 +3,7 @@
 #include <QtWidgets/QApplication>
 #include <QFile>
 #include <QTextStream>
+#include "Database.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,4 +22,5 @@ int main(int argc, char *argv[])
     CashatakMainWindow w;
     w.show();
     return a.exec();
+	Database::cleanUp();
 }

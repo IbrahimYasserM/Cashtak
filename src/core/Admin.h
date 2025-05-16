@@ -1,11 +1,10 @@
 #pragma once
 #include "Account.h"
 #include <vector>
+#include "admin.h"
+#include "User.h"
 
 using namespace std;
-
-class User;
-class Event;
 
 class Admin : public Account
 {

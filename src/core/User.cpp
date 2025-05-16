@@ -12,10 +12,10 @@ User::User()
 }
 
 // Parameterized constructor
-User::User(const string& username, const string& email,
-    const string& password, const string& accountType,
+User::User( string username,  string email,
+     string password,
     double initialBalance)
-    : Account(username, email, password, accountType), balance(initialBalance)
+    : Account(username, email, password, "User"), balance(initialBalance)
 {
     accountIdCounter++;
 }
@@ -24,7 +24,7 @@ User::User(const string& username, const string& email,
 
 // Setter for balance with password authentication
 void User::setBalance(double newBalance, string password) {
-	if (this->hashedPassword == hashPassword(password)) {      
+    if (this->hashedPassword == hashPassword(password)) {
         this->balance = newBalance;
     }
     else {
@@ -34,7 +34,7 @@ void User::setBalance(double newBalance, string password) {
 
 // Add balance with password authentication
 void User::addBalance(double amount, string password) {
-    if (this->hashedPassword ==hashPassword(password)) {      
+    if (this->hashedPassword == hashPassword(password)) {
         this->balance += amount;
     }
     else {
@@ -58,8 +58,8 @@ void User::editPassword(string userName, string currentPass, string newPass) {
 
 
 // Getters 
-vector<Transaction>& User::getHistoryTransactions() const {
-    return const_cast<vector<Transaction>&>(completedTransactions);
+vector<Transaction*>& User::getHistoryTransactions() const {
+    return const_cast<vector<Transaction*>&>(completedTransactions);
 }
 
 vector<PaymentRequest>& User::getPendingIncomingRequests() const {
@@ -73,7 +73,7 @@ double User::getBalance() const {
     return balance;
 }
 long long User::getAccountId() const {
-	return accountIdCounter;
+    return accountIdCounter;
 }
 
 
@@ -84,16 +84,23 @@ void User::requestMoney(PaymentRequest moneyRequest) {
     pendingOutgoingRequests.push_back(moneyRequest);
 }
 
-void User::sendMoney(Transaction sendMoney) {
-    if (sendMoney.getAmount() <= balance) {
-        balance -= sendMoney.getAmount();
+void User::sendMoney(Transaction* sendMoney) {
+    if (sendMoney->getAmount() <= balance) {
+        balance -= sendMoney->getAmount();
         completedTransactions.push_back(sendMoney);
     }
     else {
         //cout << "Insufficient balance to send money." << endl;
     }
 }
-
-
+void User::addPendingIncomingRequest(PaymentRequest request) {
+    pendingIncomingRequests.push_back(request);
+}
+void User::addPendingOutgoingRequest(PaymentRequest request) {
+    pendingOutgoingRequests.push_back(request);
+}
+void User::addTransaction(Transaction* transaction) {
+	completedTransactions.push_back(transaction);
+}
 // Destructor
 User::~User() = default;
