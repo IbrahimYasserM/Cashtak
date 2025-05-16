@@ -201,7 +201,7 @@
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #f0d0d0;</string>
+      <string notr="true">background-color: #000000;</string>
      </property>
      <property name="text">
       <string>Admin Panel</string>

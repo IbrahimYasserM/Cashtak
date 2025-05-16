@@ -182,19 +182,15 @@ void AdminPage::on_pushButtonDeleteUser_clicked()
                                                              QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         Database* db = Database::getInstance();
-        Account* account = db->getAccount(username.toStdString());
-        if (account && account->getAccountType() == "User") {
-            User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->deleteUser(user)) {
-                    QMessageBox::information(this, "Success", "User deleted successfully!");
-                    db->removeAccount(username.toStdString());
-                    refreshUserTable();
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to delete user.");
-                }
-            }
-        }
+        
+        // Directly remove the account from the database
+        db->removeAccount(username.toStdString());
+        
+        // Save changes to files
+        db->saveToFiles();
+        
+        QMessageBox::information(this, "Success", "User deleted successfully!");
+        refreshUserTable();
     }
 }
 
