@@ -42,21 +42,14 @@ bool Admin::EditBalance(User* user, double newBalance)
     if (!user)
         return false;
         
-    // In a real implementation, this would update the user's balance in the database
-    //cout << "Admin editing balance for user: " << user->getUsername() << endl;
-    // user->setBalance(newBalance);
-    return true;
-}
-
-bool Admin::SuspendUser(User* user)
-{
-    if (!user)
+    try {
+        // Actually update the user's balance
+        user->setBalanceDirectly(newBalance);
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error editing balance: " << e.what() << std::endl;
         return false;
-        
-    // In a real implementation, this would set a suspended flag on the user in the database
-    //cout << "Admin suspending user: " << user->getUsername() << endl;
-    // user->setSuspended(true);
-    return true;
+    }
 }
 
 bool Admin::deleteUser(User* user)

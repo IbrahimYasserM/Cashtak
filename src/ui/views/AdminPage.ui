@@ -100,13 +100,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButtonSuspendUser">
-           <property name="text">
-            <string>Suspend User</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="pushButtonDeleteUser">
            <property name="text">
             <string>Delete User</string>

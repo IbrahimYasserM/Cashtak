@@ -11,6 +11,7 @@ AdminPage::AdminPage(QWidget *parent) :
     ui->setupUi(this);
     setupConnections();
     refreshUserTable();
+    
 }
 
 AdminPage::~AdminPage()
@@ -156,35 +157,6 @@ void AdminPage::on_pushButtonEditBalance_clicked()
                     refreshUserTable();
                 } else {
                     QMessageBox::warning(this, "Error", "Failed to update balance.");
-                }
-            }
-        }
-    }
-}
-
-void AdminPage::on_pushButtonSuspendUser_clicked()
-{
-    int selectedRow = ui->tableWidgetUsers->currentRow();
-    if (selectedRow < 0) {
-        QMessageBox::warning(this, "No Selection", "Please select a user to suspend.");
-        return;
-    }
-    
-    QString username = ui->tableWidgetUsers->item(selectedRow, 0)->text();
-    
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Confirm Suspension", 
-                                                             "Are you sure you want to suspend user " + username + "?",
-                                                             QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::Yes) {
-        Database* db = Database::getInstance();
-        Account* account = db->getAccount(username.toStdString());
-        if (account && account->getAccountType() == "User") {
-            User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->SuspendUser(user)) {
-                    QMessageBox::information(this, "Success", "User suspended successfully!");
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to suspend user.");
                 }
             }
         }
