@@ -2,17 +2,52 @@
 #include "Database.h"
 #include <sstream>
 #include <iostream>
-
+#include <QDir>
+#include <QCoreApplication>
 
 Database* Database::database = nullptr;
 
 Database::Database() {
+    // Resolve the path relative to the application's directory
+    QString appPath = QCoreApplication::applicationDirPath();
+    QString resolvedPath = QDir(appPath).filePath("../../../src/resources/Data/");
+    filePath = resolvedPath.toStdString();
+    
+    std::cout << "Using data path: " << filePath << std::endl;
+    
+    // Create the directory if it doesn't exist
+    QDir dir(resolvedPath);
+    if (!dir.exists()) {
+        std::cout << "Creating directory: " << filePath << std::endl;
+        if (!dir.mkpath(".")) {
+            std::cerr << "Failed to create directory: " << filePath << std::endl;
+        }
+    }
+    
+    bool fileReadSuccess = false;
+    
+    // Rest of the constructor remains the same
     for (auto& fileName : fileNames) {
         myfile.open(filePath + fileName, std::ios::in);
         if (!myfile) {
-			cout << "Error opening " << fileName << " for reading." << endl;
-            return;
+            std::cerr << "Error opening " << fileName << " for reading from " << filePath << std::endl;
+            // Create the file if it doesn't exist
+            std::ofstream createFile(filePath + fileName);
+            if (createFile) {
+                std::cout << "Created new file: " << fileName << std::endl;
+                createFile.close();
+                // Try opening again
+                myfile.open(filePath + fileName, std::ios::in);
+                if (!myfile) {
+                    std::cerr << "Still can't open " << fileName << " after creation." << std::endl;
+                    continue;
+                }
+            } else {
+                std::cerr << "Failed to create " << fileName << std::endl;
+                continue;
+            }
         }
+
         // logic to read from the file and populate accounts, events, user, admin
         std::string line;
         if (fileName == "Admins.txt") {
@@ -68,41 +103,14 @@ Database::Database() {
             }
         }
         myfile.close();
+        fileReadSuccess = true;
     }
-    myfile.open(filePath + "pendingOutgoingRequests.txt", std::ios::in);
-    if (myfile) {
-        std::string line;
-        while (std::getline(myfile, line)) {
-            std::istringstream iss(line);
-            int id;
-            double amount;
-            std::string sender, recipient, status, type;
-            if (!(iss >> id >> amount >> sender >> recipient >> status >> type)) {
-                throw std::runtime_error("Not enough parameters in pendingIncomingRequests.txt");
-            }
-
-            auto recipientAcc = accounts.find(recipient);
-            if (recipientAcc != accounts.end() && recipientAcc->second->getAccountType() == "User") {
-                User* userAccount = dynamic_cast<User*>(recipientAcc->second);
-                if (userAccount) {
-                    userAccount->addPendingIncomingRequest(PaymentRequest(id, amount, sender, recipient, status, type));
-                }
-            }
-            else {
-                throw std::runtime_error("Recipient account not found or not a user");
-            }
-            auto senderAcc = accounts.find(sender);
-            if (senderAcc != accounts.end() && senderAcc->second->getAccountType() == "User") {
-                User* userAccount = dynamic_cast<User*>(senderAcc->second);
-                if (userAccount) {
-                    userAccount->addPendingOutgoingRequest(PaymentRequest(id, amount, sender, recipient, status, type));
-                }
-            }
-            else {
-                throw std::runtime_error("Sender account not found or not a user");
-            }
-        }
-        myfile.close();
+    
+    // If we couldn't read any files, create dummy data
+    if (!fileReadSuccess) {
+        std::cout << "No files could be read. Creating dummy data." << std::endl;
+        createDummyData();
+        saveToFiles();
     }
 }
 
@@ -328,4 +336,61 @@ void Database::addTransaction(Transaction* transaction) {
         throw std::runtime_error("Sender or recipient account not found");
     }
     transactions.push_back(transaction);
+}
+void Database::setCurrentAccount(Account* account) {
+    if (!account) {
+        user = nullptr;
+        admin = nullptr;
+        return;
+    }
+    
+    if (account->getAccountType() == "User") {
+        user = dynamic_cast<User*>(account);
+        admin = nullptr;
+    } else if (account->getAccountType() == "Admin") {
+        admin = dynamic_cast<Admin*>(account);
+        user = nullptr;
+    }
+}
+
+bool Database::saveToFiles() {
+    bool success = true;
+    
+    // Write Admins
+    std::ofstream adminFile(filePath + "Admins.txt", std::ios::out);
+    if (adminFile) {
+        for (const auto& [username, account] : accounts) {
+            if (account->getAccountType() == "Admin") {
+                adminFile << account->getUsername() << " "
+                    << account->getEmail() << " "
+                    << account->getHashedPassword() << std::endl;
+            }
+        }
+        adminFile.close();
+    } else {
+        std::cerr << "Failed to open Admins.txt for writing!" << std::endl;
+        success = false;
+    }
+
+    // Write Users
+    std::ofstream userFile(filePath + "Users.txt", std::ios::out);
+    if (userFile) {
+        for (const auto& [username, account] : accounts) {
+            if (account->getAccountType() == "User") {
+                User* user = dynamic_cast<User*>(account);
+                if (user) {
+                    userFile << user->getUsername() << " "
+                        << user->getEmail() << " "
+                        << user->getHashedPassword() << " "
+                        << user->getBalance() << std::endl;
+                }
+            }
+        }
+        userFile.close();
+    } else {
+        std::cerr << "Failed to open Users.txt for writing!" << std::endl;
+        success = false;
+    }
+    
+    return success;
 }

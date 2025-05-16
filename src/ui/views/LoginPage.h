@@ -2,6 +2,7 @@
 #define LOGINPAGE_H
 
 #include <QWidget>
+#include "../../core/Account.h"
 
 // Forward declaration of the UI class
 namespace Ui {
@@ -18,7 +19,7 @@ public:
 
 signals:
     void navigateToRegisterRequested();
-    void loginRequested(const QString& username, const QString& password); // Example: emit when login button clicked
+    void loginRequested(Account* account); // Updated to pass the account pointer
 
 private slots:
     void on_pushButtonLogin_clicked();
