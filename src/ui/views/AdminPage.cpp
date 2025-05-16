@@ -151,14 +151,18 @@ void AdminPage::on_pushButtonEditBalance_clicked()
         Account* account = db->getAccount(username.toStdString());
         if (account && account->getAccountType() == "User") {
             User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->EditBalance(user, newBalance)) {
-                    QMessageBox::information(this, "Success", "Balance updated successfully!");
-                    refreshUserTable();
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to update balance.");
-                }
+            if (user) {
+                // Directly set the balance without going through Admin
+                user->setBalanceDirectly(newBalance);
+                // Save changes to file
+                db->saveToFiles();
+                QMessageBox::information(this, "Success", "Balance updated successfully!");
+                refreshUserTable();
+            } else {
+                QMessageBox::warning(this, "Error", "Could not cast account to User type.");
             }
+        } else {
+            QMessageBox::warning(this, "Error", "Selected account is not a valid user.");
         }
     }
 }
