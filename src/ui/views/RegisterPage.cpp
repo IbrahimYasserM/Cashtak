@@ -85,11 +85,11 @@ void RegisterPage::on_pushButtonRegister_clicked()
         User* newUser = new User(usernameStr, emailStr, passwordStr, 0.0); 
         db->addAccount(newUser);
         
-        // Save the changes to files immediately
-        if (!db->saveToFiles()) {
-            QMessageBox::warning(this, "Registration Warning", 
-                "Account created in memory, but there was an issue saving to file. Your account may not persist after closing the application.");
-        }
+        // Remove the real-time save to file
+        // if (!db->saveToFiles()) {
+        //     QMessageBox::warning(this, "Registration Warning", 
+        //         "Account created in memory, but there was an issue saving to file. Your account may not persist after closing the application.");
+        // }
         
         QMessageBox::information(this, "Registration Successful", "Account created successfully! You can now log in.");
 

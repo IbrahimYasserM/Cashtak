@@ -326,10 +326,14 @@ Transaction* Database::getTransaction(int id) {
 	return nullptr;
 }
 void Database::cleanUp() {
-	if (database) {
-		delete database;
-		database = nullptr;
-	}
+    if (database) {
+        // Ensure data is saved before destruction
+        if (database) {
+            database->saveToFiles();
+        }
+        delete database;
+        database = nullptr;
+    }
 }
 void Database::addTransaction(Transaction* transaction) {
 	std::string sender = transaction->getSender();

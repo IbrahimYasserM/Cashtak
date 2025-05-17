@@ -154,8 +154,8 @@ void AdminPage::on_pushButtonEditBalance_clicked()
             if (user) {
                 // Directly set the balance without going through Admin
                 user->setBalanceDirectly(newBalance);
-                // Save changes to file
-                db->saveToFiles();
+                // Remove the real-time save to file
+                // db->saveToFiles();
                 QMessageBox::information(this, "Success", "Balance updated successfully!");
                 refreshUserTable();
             } else {
@@ -186,8 +186,8 @@ void AdminPage::on_pushButtonDeleteUser_clicked()
         // Directly remove the account from the database
         db->removeAccount(username.toStdString());
         
-        // Save changes to files
-        db->saveToFiles();
+        // Remove the real-time save to file
+        // db->saveToFiles();
         
         QMessageBox::information(this, "Success", "User deleted successfully!");
         refreshUserTable();
@@ -250,9 +250,9 @@ void AdminPage::on_pushButtonAddUser_clicked()
                 // Set the balance for the new user
                 User* newUser = dynamic_cast<User*>(db->getAccount(username.toStdString()));
                 if (newUser) {
-                    // Use an empty password since we're setting directly after creation
                     newUser->setBalanceDirectly(balance);
-                    db->saveToFiles(); // Save changes to disk
+                    // Remove the real-time save to file
+                    // db->saveToFiles();
                 }
                 
                 QMessageBox::information(this, "Success", "User added successfully!");
