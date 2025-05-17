@@ -71,10 +71,19 @@ Database::Database() {
         else if (fileName == "Users.txt") {
             while (std::getline(myfile, line)) {
                 std::istringstream iss(line);
-                std::string username, email, hashedPassword;
+                std::string username, email, hashedPassword, statusStr;
                 double balance;
-                if (!(iss >> username >> email >> hashedPassword >> balance)) {
-                    throw std::runtime_error("No enough paramaters in " + fileName); // error
+                if (!(iss >> username >> email >> hashedPassword >> balance >> statusStr)) {
+                    // If we couldn't read the status (backward compatibility),
+                    // assume the account is active
+                    statusStr = "ACTIVE";
+                    
+                    // Reset the stream to try reading without the status field
+                    iss.clear();
+                    iss.str(line);
+                    if (!(iss >> username >> email >> hashedPassword >> balance)) {
+                        throw std::runtime_error("No enough parameters in " + fileName);
+                    }
                 }
                 
                 // Important: use the hashed password directly - don't hash it again
@@ -83,6 +92,7 @@ Database::Database() {
                 account->email = email;
                 account->hashedPassword = hashedPassword; // Use hashed password as-is
                 account->accountType = "User";
+                account->status = (statusStr == "SUSPENDED") ? AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
                 account->setBalance(balance, ""); // Set balance directly
                 
                 accounts[username] = account;
@@ -153,7 +163,8 @@ Database::~Database() {
                     userFile << user->getUsername() << " "
                         << user->getEmail() << " "
                         << user->getHashedPassword() << " "
-                        << user->getBalance() << std::endl;
+                        << user->getBalance() << " "
+                        << user->getStatusString() << std::endl;
                     std::cout << "Wrote user account: " << user->getUsername() << std::endl;
                 }
             }

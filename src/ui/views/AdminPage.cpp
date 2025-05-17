@@ -37,6 +37,9 @@ void AdminPage::refreshUserTable()
         ui->tableWidgetUsers->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(user->getUsername())));
         ui->tableWidgetUsers->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(user->getEmail())));
         ui->tableWidgetUsers->setItem(row, 2, new QTableWidgetItem(QString::number(user->getBalance())));
+        
+        // Add status column
+        ui->tableWidgetUsers->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(user->getStatusString())));
     }
 
     ui->tableWidgetUsers->resizeColumnsToContents();
@@ -257,5 +260,35 @@ void AdminPage::on_pushButtonAddUser_clicked()
         } else {
             QMessageBox::warning(this, "Error", "Admin privileges required to add users.");
         }
+    }
+}
+
+// Add a new method to toggle user status
+void AdminPage::on_pushButtonToggleStatus_clicked()
+{
+    int selectedRow = ui->tableWidgetUsers->currentRow();
+    if (selectedRow < 0) {
+        QMessageBox::warning(this, "No Selection", "Please select a user first.");
+        return;
+    }
+    
+    QString username = ui->tableWidgetUsers->item(selectedRow, 0)->text();
+    QString currentStatus = ui->tableWidgetUsers->item(selectedRow, 3)->text();
+    
+    Database* db = Database::getInstance();
+    Account* account = db->getAccount(username.toStdString());
+    
+    if (account && account->getAccountType() == "User") {
+        // Toggle status
+        AccountStatus newStatus = (currentStatus == "ACTIVE") ? 
+                                 AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
+        
+        account->setStatus(newStatus);
+        
+        QString statusText = (newStatus == AccountStatus::ACTIVE) ? "activated" : "suspended";
+        QMessageBox::information(this, "Status Changed", 
+                              "User " + username + " has been " + statusText + ".");
+        
+        refreshUserTable();
     }
 }

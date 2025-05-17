@@ -81,6 +81,11 @@
            <string>Balance</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>
@@ -96,6 +101,13 @@
           <widget class="QPushButton" name="pushButtonEditBalance">
            <property name="text">
             <string>Edit Balance</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonToggleStatus">
+           <property name="text">
+            <string>Toggle Status</string>
            </property>
           </widget>
          </item>
@@ -130,4 +142,4 @@
  </widget>
  <resources/>
  <connections/>
-</ui> 
+</ui>
