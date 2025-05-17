@@ -37,7 +37,6 @@ public:
 	Account* getAccount(const std::string  username);
 	Transaction* getTransaction(int id);
 	void setCurrentAccount(Account* account);
-	bool saveToFiles();
 	const std::map<std::string, Account*>& getAccounts() const { return accounts; }
 };
 

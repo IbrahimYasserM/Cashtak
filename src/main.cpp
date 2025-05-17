@@ -6,7 +6,6 @@
 #include "core/Database.h"
 
 void cleanup() {
-    // This will call saveToFiles() via the cleanUp method
     Database::cleanUp();
 }
 

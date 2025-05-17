@@ -119,13 +119,7 @@ Database::Database() {
         myfile.close();
         fileReadSuccess = true;
     }
-    
-    // If we couldn't read any files, create dummy data
-    if (!fileReadSuccess) {
-        std::cout << "No files could be read. Creating dummy data." << std::endl;
-        createDummyData();
-        saveToFiles();
-    }
+
 }
 
 Database::~Database() {
@@ -327,10 +321,6 @@ Transaction* Database::getTransaction(int id) {
 }
 void Database::cleanUp() {
     if (database) {
-        // Ensure data is saved before destruction
-        if (database) {
-            database->saveToFiles();
-        }
         delete database;
         database = nullptr;
     }
@@ -369,46 +359,4 @@ void Database::setCurrentAccount(Account* account) {
         admin = dynamic_cast<Admin*>(account);
         user = nullptr;
     }
-}
-
-bool Database::saveToFiles() {
-    bool success = true;
-    
-    // Write Admins
-    std::ofstream adminFile(filePath + "Admins.txt", std::ios::out);
-    if (adminFile) {
-        for (const auto& [username, account] : accounts) {
-            if (account->getAccountType() == "Admin") {
-                adminFile << account->getUsername() << " "
-                    << account->getEmail() << " "
-                    << account->getHashedPassword() << std::endl;
-            }
-        }
-        adminFile.close();
-    } else {
-        std::cerr << "Failed to open Admins.txt for writing!" << std::endl;
-        success = false;
-    }
-
-    // Write Users
-    std::ofstream userFile(filePath + "Users.txt", std::ios::out);
-    if (userFile) {
-        for (const auto& [username, account] : accounts) {
-            if (account->getAccountType() == "User") {
-                User* user = dynamic_cast<User*>(account);
-                if (user) {
-                    userFile << user->getUsername() << " "
-                        << user->getEmail() << " "
-                        << user->getHashedPassword() << " " // Use the stored hash directly
-                        << user->getBalance() << std::endl;
-                }
-            }
-        }
-        userFile.close();
-    } else {
-        std::cerr << "Failed to open Users.txt for writing!" << std::endl;
-        success = false;
-    }
-    
-    return success;
 }
