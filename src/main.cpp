@@ -3,10 +3,18 @@
 #include <QtWidgets/QApplication>
 #include <QFile>
 #include <QTextStream>
+#include "core/Database.h"
+
+void cleanup() {
+    Database::cleanUp();
+}
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // Connect cleanup to application quit
+    QObject::connect(&a, &QApplication::aboutToQuit, cleanup);
 
     // Load and apply the global stylesheet
     QFile styleFile(":/style.qss");
