@@ -11,6 +11,7 @@ AdminPage::AdminPage(QWidget *parent) :
     ui->setupUi(this);
     setupConnections();
     refreshUserTable();
+    
 }
 
 AdminPage::~AdminPage()
@@ -36,6 +37,9 @@ void AdminPage::refreshUserTable()
         ui->tableWidgetUsers->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(user->getUsername())));
         ui->tableWidgetUsers->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(user->getEmail())));
         ui->tableWidgetUsers->setItem(row, 2, new QTableWidgetItem(QString::number(user->getBalance())));
+        
+        // Add status column
+        ui->tableWidgetUsers->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(user->getStatusString())));
     }
 
     ui->tableWidgetUsers->resizeColumnsToContents();
@@ -76,12 +80,12 @@ std::vector<std::string> AdminPage::getAllUsernames()
     std::vector<std::string> usernames;
     Database* db = Database::getInstance();
     
-    // This is a placeholder - in a real implementation,
-    // the Database class would have a method to retrieve all usernames
-    // For now, we'll use some dummy data
-    usernames.push_back("user1");
-    usernames.push_back("user2");
-    usernames.push_back("user3");
+    // Get all accounts from database and filter users
+    for (const auto& [username, account] : db->getAccounts()) {
+        if (account && account->getAccountType() == "User") {
+            usernames.push_back(username);
+        }
+    }
     
     return usernames;
 }
@@ -150,43 +154,16 @@ void AdminPage::on_pushButtonEditBalance_clicked()
         Account* account = db->getAccount(username.toStdString());
         if (account && account->getAccountType() == "User") {
             User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->EditBalance(user, newBalance)) {
-                    QMessageBox::information(this, "Success", "Balance updated successfully!");
-                    refreshUserTable();
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to update balance.");
-                }
-            }
-        }
-    }
-}
+            if (user) {
+                user->setBalanceDirectly(newBalance);
 
-void AdminPage::on_pushButtonSuspendUser_clicked()
-{
-    int selectedRow = ui->tableWidgetUsers->currentRow();
-    if (selectedRow < 0) {
-        QMessageBox::warning(this, "No Selection", "Please select a user to suspend.");
-        return;
-    }
-    
-    QString username = ui->tableWidgetUsers->item(selectedRow, 0)->text();
-    
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Confirm Suspension", 
-                                                             "Are you sure you want to suspend user " + username + "?",
-                                                             QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::Yes) {
-        Database* db = Database::getInstance();
-        Account* account = db->getAccount(username.toStdString());
-        if (account && account->getAccountType() == "User") {
-            User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->SuspendUser(user)) {
-                    QMessageBox::information(this, "Success", "User suspended successfully!");
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to suspend user.");
-                }
+                QMessageBox::information(this, "Success", "Balance updated successfully!");
+                refreshUserTable();
+            } else {
+                QMessageBox::warning(this, "Error", "Could not cast account to User type.");
             }
+        } else {
+            QMessageBox::warning(this, "Error", "Selected account is not a valid user.");
         }
     }
 }
@@ -206,19 +183,13 @@ void AdminPage::on_pushButtonDeleteUser_clicked()
                                                              QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         Database* db = Database::getInstance();
-        Account* account = db->getAccount(username.toStdString());
-        if (account && account->getAccountType() == "User") {
-            User* user = dynamic_cast<User*>(account);
-            if (user && admin) {
-                if (admin->deleteUser(user)) {
-                    QMessageBox::information(this, "Success", "User deleted successfully!");
-                    db->removeAccount(username.toStdString());
-                    refreshUserTable();
-                } else {
-                    QMessageBox::warning(this, "Error", "Failed to delete user.");
-                }
-            }
-        }
+        
+        // Directly remove the account from the database
+        db->removeAccount(username.toStdString());
+    
+        
+        QMessageBox::information(this, "Success", "User deleted successfully!");
+        refreshUserTable();
     }
 }
 
@@ -263,21 +234,61 @@ void AdminPage::on_pushButtonAddUser_clicked()
             return;
         }
         
+        // Check if username already exists
+        Database* db = Database::getInstance();
+        if (db->getAccount(username.toStdString())) {
+            QMessageBox::warning(this, "Username Taken", "This username is already taken. Please choose another one.");
+            return;
+        }
+        
         if (admin) {
+            // Let the admin handle user creation
             bool success = admin->addUser(username.toStdString(), email.toStdString(), 
                                          password.toStdString(), "User");
             if (success) {
-                // Add the user to the database
-                Database* db = Database::getInstance();
-                User* newUser = new User(username.toStdString(), email.toStdString(), 
-                                        password.toStdString(), balance);
-                db->addAccount(newUser);
+                // Set the balance for the new user
+                User* newUser = dynamic_cast<User*>(db->getAccount(username.toStdString()));
+                if (newUser) {
+                    newUser->setBalanceDirectly(balance);
+                }
                 
                 QMessageBox::information(this, "Success", "User added successfully!");
                 refreshUserTable();
             } else {
-                QMessageBox::warning(this, "Error", "Failed to add user.");
+                QMessageBox::warning(this, "Error", "Failed to add user. The username may already exist.");
             }
+        } else {
+            QMessageBox::warning(this, "Error", "Admin privileges required to add users.");
         }
     }
-} 
+}
+
+// Add a new method to toggle user status
+void AdminPage::on_pushButtonToggleStatus_clicked()
+{
+    int selectedRow = ui->tableWidgetUsers->currentRow();
+    if (selectedRow < 0) {
+        QMessageBox::warning(this, "No Selection", "Please select a user first.");
+        return;
+    }
+    
+    QString username = ui->tableWidgetUsers->item(selectedRow, 0)->text();
+    QString currentStatus = ui->tableWidgetUsers->item(selectedRow, 3)->text();
+    
+    Database* db = Database::getInstance();
+    Account* account = db->getAccount(username.toStdString());
+    
+    if (account && account->getAccountType() == "User") {
+        // Toggle status
+        AccountStatus newStatus = (currentStatus == "ACTIVE") ? 
+                                 AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
+        
+        account->setStatus(newStatus);
+        
+        QString statusText = (newStatus == AccountStatus::ACTIVE) ? "activated" : "suspended";
+        QMessageBox::information(this, "Status Changed", 
+                              "User " + username + " has been " + statusText + ".");
+        
+        refreshUserTable();
+    }
+}

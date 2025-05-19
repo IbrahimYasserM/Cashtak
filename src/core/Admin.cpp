@@ -2,6 +2,8 @@
 #include "Admin.h"
 #include "User.h"
 #include "Event.h"
+#include "Database.h" // Add Database.h include
+#include <iostream>   // Add iostream for std::cerr
 
 using namespace std;
 
@@ -40,21 +42,14 @@ bool Admin::EditBalance(User* user, double newBalance)
     if (!user)
         return false;
         
-    // In a real implementation, this would update the user's balance in the database
-    //cout << "Admin editing balance for user: " << user->getUsername() << endl;
-    // user->setBalance(newBalance);
-    return true;
-}
-
-bool Admin::SuspendUser(User* user)
-{
-    if (!user)
+    try {
+        // Actually update the user's balance
+        user->setBalanceDirectly(newBalance);
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error editing balance: " << e.what() << std::endl;
         return false;
-        
-    // In a real implementation, this would set a suspended flag on the user in the database
-    //cout << "Admin suspending user: " << user->getUsername() << endl;
-    // user->setSuspended(true);
-    return true;
+    }
 }
 
 bool Admin::deleteUser(User* user)
@@ -70,7 +65,33 @@ bool Admin::deleteUser(User* user)
 bool Admin::addUser(const string& username, const string& email, 
                     const string& password, const string& accountType)
 {
-    // In a real implementation, this would create a new user in the database
-    //cout << "Admin adding new user: " << username << endl;
-    return true;
+    // Check if input is valid
+    if (username.empty() || email.empty() || password.empty() || accountType.empty()) {
+        return false;
+    }
+    
+    // Check if username already exists in database
+    Database* db = Database::getInstance();
+    if (db->getAccount(username) != nullptr) {
+        return false; // Username already exists
+    }
+    
+    // Create and add the new user
+    try {
+        if (accountType == "User") {
+            User* newUser = new User(username, email, password, 0.0);
+            db->addAccount(newUser);
+            return true;
+        } else if (accountType == "Admin") {
+            Admin* newAdmin = new Admin(username, email, password);
+            db->addAccount(newAdmin);
+            return true;
+        }
+    } catch (const std::exception& e) {
+        // Log the error
+        std::cerr << "Error adding user: " << e.what() << std::endl;
+        return false;
+    }
+    
+    return false;
 }

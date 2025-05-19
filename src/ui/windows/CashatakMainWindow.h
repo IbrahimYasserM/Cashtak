@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include "../core/Account.h"
 
 // Forward declare your new page classes
 class LoginPage;
@@ -29,8 +30,8 @@ public slots:
     void navigateToTransactionsHistory();
     void navigateToAdmin();
 
-    // Example slot for when login is successful (to be called by controller later)
-    // void handleLoginSuccess(const QString& username);
+    // Add a slot to handle successful login
+    void handleLoginSuccess(Account* account);
 
 private:
     QStackedWidget *m_stackedWidget;
@@ -41,6 +42,8 @@ private:
     SendMoneyPage *m_sendMoneyPage;
     TransactionsHistoryPage *m_transactionsHistoryPage;
     AdminPage *m_adminPage;
+    
+    Account* m_currentAccount; // Store the current logged-in account
 
     void setupConnections();
 };

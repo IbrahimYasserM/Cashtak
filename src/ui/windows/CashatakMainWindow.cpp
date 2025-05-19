@@ -8,9 +8,11 @@
 #include "../views/TransactionsHistoryPage.h"// Adjusted path
 #include "../views/AdminPage.h"            // Added AdminPage
 #include <QVBoxLayout> // For setting layout if main window doesn't have a .ui
+#include "../core/User.h" // For User class
 
 CashatakMainWindow::CashatakMainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+      m_currentAccount(nullptr)
 {
     m_stackedWidget = new QStackedWidget(this);
 
@@ -49,13 +51,17 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
 }
 
 CashatakMainWindow::~CashatakMainWindow()
-{}
+{
+    // The m_currentAccount should not be deleted here as it's managed by the Database
+    m_currentAccount = nullptr;
+}
 
 void CashatakMainWindow::setupConnections()
 {
     // Login Page Connections
     connect(m_loginPage, &LoginPage::navigateToRegisterRequested, this, &CashatakMainWindow::navigateToRegister);
-    // connect(m_loginPage, &LoginPage::loginRequested, this, &SomeController::handleLoginAttempt); // For later
+    // Add connection for login success
+    connect(m_loginPage, &LoginPage::loginRequested, this, &CashatakMainWindow::handleLoginSuccess);
 
     // Register Page Connections
     connect(m_registerPage, &RegisterPage::navigateToLoginRequested, this, &CashatakMainWindow::navigateToLogin);
@@ -79,6 +85,32 @@ void CashatakMainWindow::setupConnections()
     
     // Admin Page Connections
     connect(m_adminPage, &AdminPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
+}
+
+void CashatakMainWindow::handleLoginSuccess(Account* account)
+{
+    m_currentAccount = account;
+    
+    // Set the current account in the Database
+    Database* db = Database::getInstance();
+    db->setCurrentAccount(account);
+    
+    // Set up the home page with the current account information
+    if (m_currentAccount) {
+        // Set account type
+        m_homePage->setCurrentAccountType(QString::fromStdString(m_currentAccount->getAccountType()));
+        
+        // If account is a User, set their balance
+        if (m_currentAccount->getAccountType() == "User") {
+            User* user = dynamic_cast<User*>(m_currentAccount);
+            if (user) {
+                m_homePage->setUserBalance(QString::number(user->getBalance()));
+            }
+        }
+    }
+    
+    // Navigate to home page
+    navigateToHome();
 }
 
 void CashatakMainWindow::navigateToLogin()

@@ -2,40 +2,99 @@
 #include "Database.h"
 #include <sstream>
 #include <iostream>
-
+#include <QDir>
+#include <QCoreApplication>
 
 Database* Database::database = nullptr;
 
 Database::Database() {
+    // Resolve the path relative to the application's directory
+    QString appPath = QCoreApplication::applicationDirPath();
+    QString resolvedPath = QDir(appPath).filePath("../../src/resources/Data/");
+    filePath = resolvedPath.toStdString();
+    
+    std::cout << "Using data path: " << filePath << std::endl;
+    
+    // Create the directory if it doesn't exist
+    QDir dir(resolvedPath);
+    if (!dir.exists()) {
+        std::cout << "Creating directory: " << filePath << std::endl;
+        if (!dir.mkpath(".")) {
+            std::cerr << "Failed to create directory: " << filePath << std::endl;
+        }
+    }
+    
+    bool fileReadSuccess = false;
+    
+    // Rest of the constructor remains the same
     for (auto& fileName : fileNames) {
         myfile.open(filePath + fileName, std::ios::in);
         if (!myfile) {
-			cout << "Error opening " << fileName << " for reading." << endl;
-            return;
+            std::cerr << "Error opening " << fileName << " for reading from " << filePath << std::endl;
+            // Create the file if it doesn't exist
+            std::ofstream createFile(filePath + fileName);
+            if (createFile) {
+                std::cout << "Created new file: " << fileName << std::endl;
+                createFile.close();
+                // Try opening again
+                myfile.open(filePath + fileName, std::ios::in);
+                if (!myfile) {
+                    std::cerr << "Still can't open " << fileName << " after creation." << std::endl;
+                    continue;
+                }
+            } else {
+                std::cerr << "Failed to create " << fileName << std::endl;
+                continue;
+            }
         }
+
         // logic to read from the file and populate accounts, events, user, admin
         std::string line;
         if (fileName == "Admins.txt") {
             while (std::getline(myfile, line)) {
                 std::istringstream iss(line);
-                std::string username, email, password;
-                if (!(iss >> username >> email >> password)) {
+                std::string username, email, hashedPassword;
+                if (!(iss >> username >> email >> hashedPassword)) {
                     throw std::runtime_error("No enough paramaters in " + fileName);
                 }
-                Admin* account = new Admin(username, email, password);
+                
+                // Important: use the hashed password directly - don't hash it again
+                Admin* account = new Admin();
+                account->username = username;
+                account->email = email;
+                account->hashedPassword = hashedPassword; // Use hashed password as-is
+                account->accountType = "Admin";
+                
                 accounts[username] = account;
             }
         }
         else if (fileName == "Users.txt") {
             while (std::getline(myfile, line)) {
                 std::istringstream iss(line);
-                std::string username, email, password;
+                std::string username, email, hashedPassword, statusStr;
                 double balance;
-                if (!(iss >> username >> email >> password >> balance)) {
-                    throw std::runtime_error("No enough paramaters in " + fileName); // error
+                if (!(iss >> username >> email >> hashedPassword >> balance >> statusStr)) {
+                    // If we couldn't read the status (backward compatibility),
+                    // assume the account is active
+                    statusStr = "ACTIVE";
+                    
+                    // Reset the stream to try reading without the status field
+                    iss.clear();
+                    iss.str(line);
+                    if (!(iss >> username >> email >> hashedPassword >> balance)) {
+                        throw std::runtime_error("No enough parameters in " + fileName);
+                    }
                 }
-                User* account = new User(username, email, password, balance);
-
+                
+                // Important: use the hashed password directly - don't hash it again
+                User* account = new User();
+                account->username = username;
+                account->email = email;
+                account->hashedPassword = hashedPassword; // Use hashed password as-is
+                account->accountType = "User";
+                account->status = (statusStr == "SUSPENDED") ? AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
+                account->setBalance(balance, ""); // Set balance directly
+                
                 accounts[username] = account;
             }
         }
@@ -68,42 +127,9 @@ Database::Database() {
             }
         }
         myfile.close();
+        fileReadSuccess = true;
     }
-    myfile.open(filePath + "pendingOutgoingRequests.txt", std::ios::in);
-    if (myfile) {
-        std::string line;
-        while (std::getline(myfile, line)) {
-            std::istringstream iss(line);
-            int id;
-            double amount;
-            std::string sender, recipient, status, type;
-            if (!(iss >> id >> amount >> sender >> recipient >> status >> type)) {
-                throw std::runtime_error("Not enough parameters in pendingIncomingRequests.txt");
-            }
 
-            auto recipientAcc = accounts.find(recipient);
-            if (recipientAcc != accounts.end() && recipientAcc->second->getAccountType() == "User") {
-                User* userAccount = dynamic_cast<User*>(recipientAcc->second);
-                if (userAccount) {
-                    userAccount->addPendingIncomingRequest(PaymentRequest(id, amount, sender, recipient, status, type));
-                }
-            }
-            else {
-                throw std::runtime_error("Recipient account not found or not a user");
-            }
-            auto senderAcc = accounts.find(sender);
-            if (senderAcc != accounts.end() && senderAcc->second->getAccountType() == "User") {
-                User* userAccount = dynamic_cast<User*>(senderAcc->second);
-                if (userAccount) {
-                    userAccount->addPendingOutgoingRequest(PaymentRequest(id, amount, sender, recipient, status, type));
-                }
-            }
-            else {
-                throw std::runtime_error("Sender account not found or not a user");
-            }
-        }
-        myfile.close();
-    }
 }
 
 Database::~Database() {
@@ -137,7 +163,8 @@ Database::~Database() {
                     userFile << user->getUsername() << " "
                         << user->getEmail() << " "
                         << user->getHashedPassword() << " "
-                        << user->getBalance() << std::endl;
+                        << user->getBalance() << " "
+                        << user->getStatusString() << std::endl;
                     std::cout << "Wrote user account: " << user->getUsername() << std::endl;
                 }
             }
@@ -304,10 +331,10 @@ Transaction* Database::getTransaction(int id) {
 	return nullptr;
 }
 void Database::cleanUp() {
-	if (database) {
-		delete database;
-		database = nullptr;
-	}
+    if (database) {
+        delete database;
+        database = nullptr;
+    }
 }
 void Database::addTransaction(Transaction* transaction) {
 	std::string sender = transaction->getSender();
@@ -328,4 +355,19 @@ void Database::addTransaction(Transaction* transaction) {
         throw std::runtime_error("Sender or recipient account not found");
     }
     transactions.push_back(transaction);
+}
+void Database::setCurrentAccount(Account* account) {
+    if (!account) {
+        user = nullptr;
+        admin = nullptr;
+        return;
+    }
+    
+    if (account->getAccountType() == "User") {
+        user = dynamic_cast<User*>(account);
+        admin = nullptr;
+    } else if (account->getAccountType() == "Admin") {
+        admin = dynamic_cast<Admin*>(account);
+        user = nullptr;
+    }
 }

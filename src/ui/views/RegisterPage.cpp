@@ -84,6 +84,7 @@ void RegisterPage::on_pushButtonRegister_clicked()
     try {
         User* newUser = new User(usernameStr, emailStr, passwordStr, 0.0); 
         db->addAccount(newUser);
+        
         QMessageBox::information(this, "Registration Successful", "Account created successfully! You can now log in.");
 
         // Navigate to Login Page
@@ -121,4 +122,4 @@ void RegisterPage::on_pushButtonGoToLogin_clicked()
         qWarning() << "RegisterPage: Could not find CashatakMainWindow instance for login navigation.";
         emit navigateToLoginRequested(); 
     }
-} 
+}

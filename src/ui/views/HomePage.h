@@ -2,6 +2,7 @@
 #define HOMEPAGE_H
 
 #include <QWidget>
+#include "../../core/Account.h"
 
 namespace Ui {
 class HomePage;
@@ -16,6 +17,7 @@ public:
     ~HomePage();
 
     void setUserBalance(const QString& balance); // Method to update balance display
+    void setCurrentAccountType(const QString& accountType); // Method to set the current account type
 
 signals:
     void navigateToSendPaymentRequestRequested();
@@ -33,6 +35,7 @@ private slots:
 
 private:
     Ui::HomePage *ui;
+    QString m_accountType; // Store the current account type
 };
 
 #endif // HOMEPAGE_H 

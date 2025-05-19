@@ -34,7 +34,7 @@ private slots:
     void on_pushButtonRefresh_clicked();
     void on_pushButtonSearch_clicked();
     void on_pushButtonEditBalance_clicked();
-    void on_pushButtonSuspendUser_clicked();
+    void on_pushButtonToggleStatus_clicked(); // New slot for toggling status
     void on_pushButtonDeleteUser_clicked();
     void on_pushButtonAddUser_clicked();
 
@@ -47,4 +47,4 @@ private:
     void loadUsers();
     void searchUsers(const QString& searchTerm);
     std::vector<std::string> getAllUsernames();
-}; 
+};
