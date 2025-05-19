@@ -22,7 +22,7 @@ private:
 	std::vector<Transaction*> transactions;
 	User* user = nullptr;
 	Admin* admin = nullptr;
-	std::string filePath = "../../../../src/resources/Data/";
+	std::string filePath;
 	std::vector<std::string> fileNames = { "Admins.txt", "Users.txt","CompletedTransactions.txt" };
 
 public:
