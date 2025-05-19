@@ -33,10 +33,6 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
     m_stackedWidget->addWidget(m_adminPage);
 
     if (!centralWidget()) { // Check if a central widget is already set (e.g. by a .ui file)
-        QWidget *centralContainer = new QWidget(this);
-        QVBoxLayout *layout = new QVBoxLayout(centralContainer);
-        QLabel* name = new QLabel("Cashatak", this);
-        layout->addWidget(name);
         layout->addWidget(m_stackedWidget);
         layout->setContentsMargins(0,0,0,0);
         setCentralWidget(centralContainer);
@@ -102,6 +98,17 @@ void CashatakMainWindow::handleLoginSuccess(Account* account)
         if (m_currentAccount->getAccountType() == "User") {
             User* user = dynamic_cast<User*>(m_currentAccount);
             m_homePage->setUserBalance(QString::asprintf("$%.2f", user->getBalance()));
+
+            QHBoxLayout* headerLayout = new QHBoxLayout();
+            QLabel* username = new QLabel(user->getUsername().c_str(), this);
+            QLabel* email = new QLabel(user->getEmail().c_str(), this);
+			username->setStyleSheet("font-weight: bold; font-size: 16px;");
+			email->setStyleSheet("font-size: 14px;");
+            headerLayout->addWidget(username);
+            headerLayout->addWidget(email);
+            QWidget* header = new QWidget(this);
+            header->setLayout(headerLayout);
+            layout->insertWidget(0, header);
             // Navigate to home page
             navigateToHome();
         }
