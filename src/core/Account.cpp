@@ -2,19 +2,13 @@
 #include "Account.h"
 #include <string>
 #include <sstream>
-#include <functional> // For std::hash
 using namespace std;
 
 
 // Hashing function for password
 string Account::hashPassword(const string& password)
 {
-    size_t hash = std::hash<string>{}(password);
-
-    // Convert to string
-    stringstream ss;
-    ss << hex << hash;
-    return ss.str();
+    return password;
 }
 
 
