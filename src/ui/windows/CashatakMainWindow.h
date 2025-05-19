@@ -45,5 +45,8 @@ private:
     
     Account* m_currentAccount; // Store the current logged-in account
 
+    QWidget* centralContainer = new QWidget(this);
+    QVBoxLayout* layout = new QVBoxLayout(centralContainer);
+
     void setupConnections();
 };

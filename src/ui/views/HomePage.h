@@ -17,25 +17,21 @@ public:
     ~HomePage();
 
     void setUserBalance(const QString& balance); // Method to update balance display
-    void setCurrentAccountType(const QString& accountType); // Method to set the current account type
 
 signals:
     void navigateToSendPaymentRequestRequested();
     void navigateToSendMoneyRequested();
     void navigateToTransactionsHistoryRequested();
-    void navigateToAdminRequested();
     void logoutRequested(); // Example for a logout button if you add one
 
 private slots:
     void on_pushButtonSendPaymentRequest_clicked();
     void on_pushButtonSendMoney_clicked();
     void on_pushButtonShowTransactions_clicked();
-    void on_pushButtonAdmin_clicked();
     // Add a slot for logout if you add a logout button
 
 private:
     Ui::HomePage *ui;
-    QString m_accountType; // Store the current account type
 };
 
 #endif // HOMEPAGE_H 

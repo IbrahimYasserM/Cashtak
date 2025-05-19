@@ -23,23 +23,13 @@ User::User( string username,  string email,
 
 
 // Setter for balance with password authentication
-void User::setBalance(double newBalance, string password) {
-    if (this->hashedPassword == hashPassword(password)) {
-        this->balance = newBalance;
-    }
-    else {
-        //cout << "Incorrect password. Balance not updated." << endl;
-    }
+void User::setBalance(double newBalance) {
+    this->balance = newBalance;
 }
 
 // Add balance with password authentication
-void User::addBalance(double amount, string password) {
-    if (this->hashedPassword == hashPassword(password)) {
-        this->balance += amount;
-    }
-    else {
-        //cout << "Incorrect password. Amount not added." << endl;
-    }
+void User::addBalance(double amount) {
+    this->balance += amount;
 }
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>634</height>
+    <height>392</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -64,6 +64,9 @@
           <pointsize>14</pointsize>
           <bold>true</bold>
          </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #27db1a</string>
         </property>
         <property name="text">
          <string>$0.00</string>
@@ -178,33 +181,6 @@
      </property>
      <property name="text">
       <string>Show Transactions History</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButtonAdmin">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: #000000;</string>
-     </property>
-     <property name="text">
-      <string>Admin Panel</string>
      </property>
     </widget>
    </item>

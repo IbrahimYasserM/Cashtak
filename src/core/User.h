@@ -25,13 +25,13 @@ public:
     ~User();
 
     //getters and setters 
-    void setBalance(double newBalance, string password);
+    void setBalance(double newBalance);
     double getBalance() const;
     long long getAccountId() const;
     vector<Transaction*>& getHistoryTransactions() const;
     vector<PaymentRequest>& getPendingIncomingRequests() const;
     vector<PaymentRequest>& getPendingOutgoingRequests() const;
-    void addBalance(double amount, string password);
+    void addBalance(double amount);
 
     // Methods to handle user account
     void editPassword(string userName, string currentPass, string newPass);
