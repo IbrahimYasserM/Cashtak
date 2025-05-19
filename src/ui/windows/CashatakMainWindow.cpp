@@ -8,6 +8,7 @@
 #include "../views/TransactionsHistoryPage.h"// Adjusted path
 #include "../views/AdminPage.h"            // Added AdminPage
 #include <QVBoxLayout> // For setting layout if main window doesn't have a .ui
+#include <QSystemTrayIcon>
 #include "../core/User.h" // For User class
 
 CashatakMainWindow::CashatakMainWindow(QWidget *parent)
@@ -106,11 +107,30 @@ void CashatakMainWindow::handleLoginSuccess(Account* account)
 			email->setStyleSheet("font-size: 14px;");
             headerLayout->addWidget(username);
             headerLayout->addWidget(email);
+			QIcon logoutIcon("../../../../assets/images/logout.png");
+            QPushButton* logoutButton = new QPushButton("", this);
+			logoutButton->setIcon(logoutIcon);
+			logoutButton->setIconSize(QSize(24, 24));
+			logoutButton->setStyleSheet("border: none; background: transparent;");
+            logoutButton->setMaximumSize(20, 20);
+            headerLayout->addWidget(logoutButton);
             QWidget* header = new QWidget(this);
             header->setLayout(headerLayout);
             layout->insertWidget(0, header);
+            connect(logoutButton, &QPushButton::clicked, this, [=]() {
+                layout->removeWidget(header);
+				delete header;
+				navigateToLogin();
+                });
             // Navigate to home page
             navigateToHome();
+
+            // Make sure QSystemTrayIcon is initialized and shown
+			QIcon* icon = new QIcon("../../../../assets/images/bell.png");
+            QSystemTrayIcon* trayIcon = new QSystemTrayIcon(*icon, this);
+            trayIcon->show();
+            // Show a balloon message
+            trayIcon->showMessage("Update", "Download successfully!", QSystemTrayIcon::Information, 3000);
         }
         else if (m_currentAccount->getAccountType() == "Admin") {
             // Admin specific setup if needed
@@ -118,6 +138,7 @@ void CashatakMainWindow::handleLoginSuccess(Account* account)
         }
     }
 }
+
 void CashatakMainWindow::navigateToLogin()
 {
     m_stackedWidget->setCurrentWidget(m_loginPage);
