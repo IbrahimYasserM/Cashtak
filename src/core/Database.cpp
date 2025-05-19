@@ -93,7 +93,7 @@ Database::Database() {
                 account->hashedPassword = hashedPassword; // Use hashed password as-is
                 account->accountType = "User";
                 account->status = (statusStr == "SUSPENDED") ? AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
-                account->setBalance(balance, ""); // Set balance directly
+                account->setBalance(balance); // Set balance directly
                 
                 accounts[username] = account;
             }
