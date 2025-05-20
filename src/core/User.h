@@ -2,8 +2,10 @@
 #include "Account.h"
 #include "Transaction.h"
 #include "PaymentRequest.h"
+#include "Notification.h"
 #include <string>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -15,6 +17,7 @@ private:
     vector<Transaction*> completedTransactions;
     vector<PaymentRequest> pendingIncomingRequests;  // Pending requests that other users request it from me 
     vector<PaymentRequest> pendingOutgoingRequests;  // Pending requests that I request from other users
+    queue<Notification> notifications;
 
 public:
     // Constructors
@@ -31,6 +34,7 @@ public:
     vector<Transaction*>& getHistoryTransactions() const;
     vector<PaymentRequest>& getPendingIncomingRequests() const;
     vector<PaymentRequest>& getPendingOutgoingRequests() const;
+    queue<Notification>& getNotifications() const;
     void addBalance(double amount);
 
     // Methods to handle user account
@@ -42,6 +46,9 @@ public:
     void addPendingIncomingRequest(PaymentRequest request);
     void addPendingOutgoingRequest(PaymentRequest request);
 	void addTransaction(Transaction* transaction);
+    void addNotificationTransaction(Transaction* transaction);
+    void addNotificationRequest(PaymentRequest* request);
+
 
     // Add this to allow Database and Admin to directly set balance
     void setBalanceDirectly(double newBalance) {

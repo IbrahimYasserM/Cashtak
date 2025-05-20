@@ -130,7 +130,11 @@ void CashatakMainWindow::handleLoginSuccess(Account* account)
             QSystemTrayIcon* trayIcon = new QSystemTrayIcon(*icon, this);
             trayIcon->show();
             // Show a balloon message
-            trayIcon->showMessage("Update", "Download successfully!", QSystemTrayIcon::Information, 3000);
+            while (!user->getNotifications().empty()) {
+                Notification notification = user->getNotifications().front();
+                user->getNotifications().pop();
+                trayIcon->showMessage(notification.getTitle().c_str(), notification.getMessage().c_str(), QSystemTrayIcon::Information, 1000);
+            }
         }
         else if (m_currentAccount->getAccountType() == "Admin") {
             // Admin specific setup if needed

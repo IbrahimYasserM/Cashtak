@@ -59,6 +59,9 @@ vector<PaymentRequest>& User::getPendingIncomingRequests() const {
 vector<PaymentRequest>& User::getPendingOutgoingRequests() const {
     return const_cast<vector<PaymentRequest>&>(pendingOutgoingRequests);
 }
+queue<Notification>& User::getNotifications() const {
+    return const_cast<queue<Notification>&>(notifications);
+}
 double User::getBalance() const {
     return balance;
 }
@@ -91,6 +94,12 @@ void User::addPendingOutgoingRequest(PaymentRequest request) {
 }
 void User::addTransaction(Transaction* transaction) {
 	completedTransactions.push_back(transaction);
+}
+void User::addNotificationTransaction(Transaction* transaction) {
+    notifications.push(Notification(transaction));
+}
+void User::addNotificationRequest(PaymentRequest* request) {
+    notifications.push(Notification(request));
 }
 // Destructor
 User::~User() = default;

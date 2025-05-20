@@ -5,12 +5,12 @@
 class Notification
 {
 	std::string title, message;
-	std::time_t date;
 public:
-	Notification();
-	Notification(const Transaction);
-	Notification(const PaymentRequest);
+	Notification(Transaction*);
+	Notification(PaymentRequest*);
 	~Notification();
-	void display();
+	
+	std::string getTitle();
+	std::string getMessage();
 };
 
