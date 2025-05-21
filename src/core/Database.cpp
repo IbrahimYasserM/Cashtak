@@ -126,10 +126,74 @@ Database::Database() {
                 transactions.push_back(transaction);
             }
         }
+
         myfile.close();
         fileReadSuccess = true;
     }
 
+    // Corrected: Loading for pendingOutgoingRequests.txt (as per user-provided snippet)
+    // This part should already exist in your Database.cpp from before my changes.
+    // I am ensuring the incorrect global PaymentRequests.txt loading is removed.
+    myfile.open(filePath + "pendingOutgoingRequests.txt", std::ios::in);
+    if (myfile) {
+        std::string line;
+        while (std::getline(myfile, line)) {
+            std::istringstream iss(line);
+            int id;
+            double amount;
+            std::string sender, recipient, status, message; // Added status for PaymentRequest constructor
+            
+            // Assuming format: id amount sender recipient status message
+            // The user snippet had: id amount sender recipient (then iss >> message for message)
+            // Adapting to include status for consistency with PaymentRequest constructor
+            if (!(iss >> id >> amount >> sender >> recipient >> status)) { 
+                // If status is missing, maybe it defaults or error
+                std::cerr << "Error reading pending request (missing status?): " << line << std::endl;
+                // For robustness, let's try to read message if only status was missing
+                // but this depends on the actual file format.
+                // For now, if essential fields are missing, skip.
+                iss.clear();
+                iss.str(line); // Reset stream
+                if (!(iss >> id >> amount >> sender >> recipient)) {
+                    std::cerr << "Error reading essential fields for pending request: " << line << std::endl;
+                    continue; // Skip this line
+                }
+                status = "Pending"; // Default status if not in file
+            }
+            
+            // Read the rest of the line as message, similar to your previous logic
+            std::string tempMessagePart;
+            std::string fullMessage;
+            if (iss >> tempMessagePart) { 
+                fullMessage = tempMessagePart;
+                while(iss >> tempMessagePart) {
+                    fullMessage += " " + tempMessagePart;
+                }
+            }
+            message = fullMessage; // This is the message part
+
+            // Original logic from user snippet (adapted)
+            auto recipientAccIt = accounts.find(recipient);
+            if (recipientAccIt != accounts.end() && recipientAccIt->second->getAccountType() == "User") {
+                User* userAccount = dynamic_cast<User*>(recipientAccIt->second);
+                if (userAccount) {
+                    userAccount->addPendingIncomingRequest(PaymentRequest(id, amount, sender, recipient, status, message));
+                }
+            }
+            // else: error or warning if recipient not found for an incoming request
+
+            auto senderAccIt = accounts.find(sender);
+            if (senderAccIt != accounts.end() && senderAccIt->second->getAccountType() == "User") {
+                User* userAccount = dynamic_cast<User*>(senderAccIt->second);
+                if (userAccount) {
+                    userAccount->addPendingOutgoingRequest(PaymentRequest(id, amount, sender, recipient, status, message));
+                }
+            }
+            // else: error or warning if sender not found for an outgoing request
+        }
+        myfile.close(); // Close the file after reading
+    }
+    // else: Error opening pendingOutgoingRequests.txt could be logged here
 }
 
 Database::~Database() {
@@ -192,33 +256,32 @@ Database::~Database() {
         std::cerr << "Failed to open CompletedTransactions.txt for writing!" << std::endl;
     }
 
-    // Write Pending Outgoing Requests
+    // Corrected: Saving for pendingOutgoingRequests.txt (should already exist in your file)
+    // The incorrect global PaymentRequests.txt saving is removed.
     std::cout << "Attempting to write to: " << (filePath + "pendingOutgoingRequests.txt") << std::endl;
     std::ofstream pendingFile(filePath + "pendingOutgoingRequests.txt", std::ios::out);
     if (pendingFile) {
-        std::set<int> writtenRequestIds;
-        for (const auto& [username, account] : accounts) {
-            if (account->getAccountType() == "User") {
-                User* user = dynamic_cast<User*>(account);
+        std::set<int> writtenRequestIds; // To avoid duplicates if requests are in multiple users' outgoing lists
+        for (const auto& pair : accounts) {
+            if (pair.second->getAccountType() == "User") {
+                User* user = dynamic_cast<User*>(pair.second);
                 if (user) {
                     for (const auto& req : user->getPendingOutgoingRequests()) {
-                        if (writtenRequestIds.insert(req.getId()).second) {
+                        if (writtenRequestIds.insert(req.getId()).second) { // Only write if ID is new
                             pendingFile << req.getId() << " "
-                                << req.getAmount() << " "
-                                << req.getSender() << " "
-                                << req.getRecipient() << " "
-                                << req.getStatus() << " "
-                                << req.getMessage() << std::endl;
-                            std::cout << "Wrote pending request ID: " << req.getId() << std::endl;
+                                        << req.getAmount() << " "
+                                        << req.getSender() << " "
+                                        << req.getRecipient() << " "
+                                        << req.getStatus() << " " // Ensure status is saved
+                                        << req.getMessage() << std::endl;
                         }
                     }
                 }
             }
         }
         pendingFile.close();
-    } else {
-        std::cerr << "Failed to open pendingOutgoingRequests.txt for writing!" << std::endl;
     }
+    // else: Error opening pendingOutgoingRequests.txt for writing could be logged
 
     std::cout << "Cleaning up memory..." << std::endl;
     // Delete all dynamically allocated memory

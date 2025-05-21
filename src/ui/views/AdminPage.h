@@ -29,9 +29,8 @@ public slots:
 
 signals:
     void navigateToHomeRequested();
-
+    void navigateToLoginRequested();
 private slots:
-    void on_pushButtonBackHome_clicked();
     void on_pushButtonRefresh_clicked();
     void on_pushButtonSearch_clicked();
     void on_pushButtonEditBalance_clicked();
@@ -40,6 +39,7 @@ private slots:
     void on_pushButtonAddUser_clicked();
     void on_pushButtonViewAllTransactions_clicked();
     void on_userTransactionButtonClicked();
+    void on_logout_clicked();
 
 private:
     Ui::AdminPage *ui;

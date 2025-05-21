@@ -1,43 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TransactionsHistoryPage</class>
- <widget class="QWidget" name="TransactionsHistoryPage">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>300</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Transactions History</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Transactions History Page</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButtonBackToHome">
-     <property name="text">
-      <string>Back to Home</string>
-     </property>
-    </widget>
-   </item>
-  </layout>
- </widget>
- <resources/>
- <connections/>
-</ui> 
+	<class>TransactionsHistoryPage</class>
+	<widget class="QWidget" name="TransactionsHistoryPage">
+		<property name="geometry">
+			<rect>
+				<x>0</x>
+				<y>0</y>
+				<width>800</width>
+				<height>600</height>
+			</rect>
+		</property>
+		<property name="windowTitle">
+			<string>Transactions History</string>
+		</property>
+		<layout class="QVBoxLayout" name="verticalLayout">
+			<item>
+				<widget class="QLabel" name="labelTitle">
+					<property name="font">
+						<font>
+							<pointsize>16</pointsize>
+							<bold>true</bold>
+						</font>
+					</property>
+					<property name="text">
+						<string>Recent Transactions</string>
+					</property>
+					<property name="alignment">
+						<set>Qt::AlignCenter</set>
+					</property>
+				</widget>
+			</item>
+			<item>
+				<widget class="QTableWidget" name="tableWidgetTransactions"/>
+			</item>
+			<item>
+				<layout class="QHBoxLayout" name="horizontalLayout_2">
+					<item>
+						<widget class="QPushButton" name="pushButtonViewAllTransactions">
+							<property name="minimumSize">
+								<size>
+									<width>0</width>
+									<height>40</height>
+								</size>
+							</property>
+							<property name="font">
+								<font>
+									<pointsize>10</pointsize>
+								</font>
+							</property>
+							<property name="text">
+								<string>View All Completed Transactions</string>
+							</property>
+						</widget>
+					</item>
+					<item>
+						<widget class="QPushButton" name="pushButtonViewIncomingRequests">
+							<property name="minimumSize">
+								<size>
+									<width>0</width>
+									<height>40</height>
+								</size>
+							</property>
+							<property name="font">
+								<font>
+									<pointsize>10</pointsize>
+								</font>
+							</property>
+							<property name="text">
+								<string>View Pending Incoming Requests</string>
+							</property>
+						</widget>
+					</item>
+					<item>
+						<widget class="QPushButton" name="pushButtonViewOutgoingRequests">
+							<property name="minimumSize">
+								<size>
+									<width>0</width>
+									<height>40</height>
+								</size>
+							</property>
+							<property name="font">
+								<font>
+									<pointsize>10</pointsize>
+								</font>
+							</property>
+							<property name="text">
+								<string>View Pending Outgoing Requests</string>
+							</property>
+						</widget>
+					</item>
+				</layout>
+			</item>
+			<item>
+				<layout class="QHBoxLayout" name="horizontalLayout">
+					<item>
+						<widget class="QPushButton" name="pushButtonBackToHome">
+							<property name="minimumSize">
+								<size>
+									<width>120</width>
+									<height>30</height>
+								</size>
+							</property>
+							<property name="text">
+								<string>Back to Home</string>
+							</property>
+						</widget>
+					</item>
+					<item>
+						<spacer name="horizontalSpacer">
+							<property name="orientation">
+								<enum>Qt::Horizontal</enum>
+							</property>
+							<property name="sizeHint" stdset="0">
+								<size>
+									<width>40</width>
+									<height>20</height>
+								</size>
+							</property>
+						</spacer>
+					</item>
+				</layout>
+			</item>
+		</layout>
+	</widget>
+	<resources/>
+	<connections/>
+</ui>

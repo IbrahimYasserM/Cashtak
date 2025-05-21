@@ -107,9 +107,9 @@ void AdminPage::searchUsers(const QString& searchTerm)
     ui->tableWidgetUsers->resizeColumnsToContents();
 }
 
-void AdminPage::on_pushButtonBackHome_clicked()
+void AdminPage::on_logout_clicked()
 {
-    emit navigateToHomeRequested();
+    emit navigateToLoginRequested();
 }
 
 void AdminPage::on_pushButtonRefresh_clicked()

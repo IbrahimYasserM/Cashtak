@@ -3,7 +3,7 @@
 #include "../views/LoginPage.h" 		// Adjusted path
 #include "../views/RegisterPage.h"          // Adjusted path
 #include "../views/HomePage.h"              // Adjusted path
-#include "../views/SendPaymentRequestPage.h"// Adjusted path
+#include "../views/RequestMoney.h"// Adjusted path
 #include "../views/SendMoneyPage.h"         // Adjusted path
 #include "../views/TransactionsHistoryPage.h"// Adjusted path
 #include "../views/AdminPage.h"            // Added AdminPage
@@ -20,7 +20,7 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
     m_loginPage = new LoginPage(this);
     m_registerPage = new RegisterPage(this);
     m_homePage = new HomePage(this);
-    m_sendPaymentRequestPage = new SendPaymentRequestPage(this);
+    m_requestMoneyPage = new RequestMoney(this);
     m_sendMoneyPage = new SendMoneyPage(this);
     m_transactionsHistoryPage = new TransactionsHistoryPage(this);
     m_adminPage = new AdminPage(this);
@@ -28,7 +28,7 @@ CashatakMainWindow::CashatakMainWindow(QWidget *parent)
 	m_stackedWidget->addWidget(m_loginPage);
 	m_stackedWidget->addWidget(m_registerPage);
     m_stackedWidget->addWidget(m_homePage);
-    m_stackedWidget->addWidget(m_sendPaymentRequestPage);
+    m_stackedWidget->addWidget(m_requestMoneyPage);
     m_stackedWidget->addWidget(m_sendMoneyPage);
     m_stackedWidget->addWidget(m_transactionsHistoryPage);
     m_stackedWidget->addWidget(m_adminPage);
@@ -73,7 +73,7 @@ void CashatakMainWindow::setupConnections()
     // connect(m_homePage, &HomePage::logoutRequested, this, &CashatakMainWindow::navigateToLogin); // Example for logout
 
     // Send Payment Request Page Connections
-    connect(m_sendPaymentRequestPage, &SendPaymentRequestPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
+    connect(m_requestMoneyPage, &RequestMoney::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
 
     // Send Money Page Connections
     connect(m_sendMoneyPage, &SendMoneyPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
@@ -83,6 +83,7 @@ void CashatakMainWindow::setupConnections()
     
     // Admin Page Connections
     connect(m_adminPage, &AdminPage::navigateToHomeRequested, this, &CashatakMainWindow::navigateToHome);
+    connect(m_adminPage, &AdminPage::navigateToLoginRequested, this, &CashatakMainWindow::navigateToLogin);
 }
 
 void CashatakMainWindow::handleLoginSuccess(Account* account)
@@ -160,7 +161,7 @@ void CashatakMainWindow::navigateToHome()
 
 void CashatakMainWindow::navigateToSendPaymentRequest()
 {
-    m_stackedWidget->setCurrentWidget(m_sendPaymentRequestPage);
+    m_stackedWidget->setCurrentWidget(m_requestMoneyPage);
 }
 
 void CashatakMainWindow::navigateToSendMoney()
@@ -170,7 +171,22 @@ void CashatakMainWindow::navigateToSendMoney()
 
 void CashatakMainWindow::navigateToTransactionsHistory()
 {
-    m_stackedWidget->setCurrentWidget(m_transactionsHistoryPage);
+    if (m_currentAccount && m_currentAccount->getAccountType() == "User") {
+        User* currentUser = dynamic_cast<User*>(m_currentAccount);
+        if (currentUser) {
+            m_transactionsHistoryPage->loadUserData(currentUser); // Load data before showing
+            m_stackedWidget->setCurrentWidget(m_transactionsHistoryPage);
+        } else {
+            // This case should ideally not happen if m_currentAccount type is "User"
+            // but good to handle defensively.
+            QMessageBox::critical(this, "Error", "Failed to cast current account to User type.");
+            navigateToLogin(); // Or some other appropriate action
+        }
+    } else {
+        // No user logged in or account is not a User type
+        QMessageBox::warning(this, "Login Required", "You must be logged in as a user to view transaction history.");
+        navigateToLogin(); // Redirect to login
+    }
 }
 
 void CashatakMainWindow::navigateToAdmin()
