@@ -5,8 +5,6 @@
 
 using namespace std;
 
-class Event; // Forward declaration
-
 class Admin : public Account
 {
 public:
@@ -15,11 +13,12 @@ public:
           const string& password);
     ~Admin();
 
-    vector<User*> ViewUsers() const;
-    vector<Event*> ViewEvents() const;
+    // User management methods
+    vector<User*> getAllUsers() const; // Added method to get all users
     bool EditBalance(User* user, double newBalance);
     bool deleteUser(User* user);
     bool addUser(const string& username, const string& email, 
                  const string& password, const string& accountType);
+    bool toggleUserStatus(User* user); // Added method to toggle user status
 };
 
