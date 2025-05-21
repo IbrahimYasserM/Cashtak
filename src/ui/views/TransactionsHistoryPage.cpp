@@ -1,20 +1,27 @@
-// TransactionsHistoryPage.cpp
 #include "TransactionsHistoryPage.h"
 #include "ui_TransactionsHistoryPage.h"
-#include "../core/Database.h"
-#include <QDateTime>
-#include <QMessageBox>
-#include <algorithm>
-#include <iostream>
+#include "../core/User.h"         // For User class
+#include "../core/Transaction.h"  // For Transaction class
+#include "../core/PaymentRequest.h" // For PaymentRequest class
+#include <QMessageBox>          // For potential error messages
+#include <algorithm>            // For std::sort or std::min
+#include <iostream>             // For debugging output
+
 TransactionsHistoryPage::TransactionsHistoryPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TransactionsHistoryPage),
     m_currentUser(nullptr)
 {
     ui->setupUi(this);
-    
-    // Setup the transaction table
-    setupTransactionTable();
+
+    // Connect button signals to their respective slots (as per plan.md section 2.2)
+    connect(ui->pushButtonViewAllTransactions, &QPushButton::clicked, this, &TransactionsHistoryPage::on_pushButtonViewAllTransactions_clicked);
+    connect(ui->pushButtonViewIncomingRequests, &QPushButton::clicked, this, &TransactionsHistoryPage::on_pushButtonViewIncomingRequests_clicked);
+    connect(ui->pushButtonViewOutgoingRequests, &QPushButton::clicked, this, &TransactionsHistoryPage::on_pushButtonViewOutgoingRequests_clicked);
+    connect(ui->pushButtonBackToHome, &QPushButton::clicked, this, &TransactionsHistoryPage::on_pushButtonBackToHome_clicked);
+
+    // Initial table setup (though displayRecentTransactions will also call it)
+    setupTransactionTable(); 
 }
 
 TransactionsHistoryPage::~TransactionsHistoryPage()
@@ -25,28 +32,31 @@ TransactionsHistoryPage::~TransactionsHistoryPage()
 void TransactionsHistoryPage::loadUserData(User* currentUser)
 {
     m_currentUser = currentUser;
-    
     if (m_currentUser) {
-        displayRecentTransactions();
+        displayRecentTransactions(); // Show initial view (plan.md section 2.3)
+    } else {
+        // Handle case where user is null, e.g., clear table and show a message
+        clearTable();
+        ui->labelTitle->setText("No user data loaded.");
+        // Optionally disable buttons if no user is loaded
     }
 }
 
 void TransactionsHistoryPage::setupTransactionTable()
 {
-    // Configure table for transactions
-    ui->tableWidgetTransactions->setColumnCount(6);
+    ui->tableWidgetTransactions->setColumnCount(7); // Added "Type" column
     ui->tableWidgetTransactions->setHorizontalHeaderLabels(
-        {"ID", "Date", "Amount", "Sender", "Recipient", "Status"});
+        {"ID", "Date", "Amount", "Sender", "Recipient", "Status", "Type"}); // Plan.md section 2.4
     
-    // Set column widths
-    ui->tableWidgetTransactions->setColumnWidth(0, 50);  // ID
-    ui->tableWidgetTransactions->setColumnWidth(1, 150); // Date
-    ui->tableWidgetTransactions->setColumnWidth(2, 100); // Amount
-    ui->tableWidgetTransactions->setColumnWidth(3, 150); // Sender
-    ui->tableWidgetTransactions->setColumnWidth(4, 150); // Recipient
-    ui->tableWidgetTransactions->setColumnWidth(5, 100); // Status
+    // Set column widths (adjust as needed)
+    ui->tableWidgetTransactions->setColumnWidth(0, 50);   // ID
+    ui->tableWidgetTransactions->setColumnWidth(1, 150);  // Date
+    ui->tableWidgetTransactions->setColumnWidth(2, 100);  // Amount
+    ui->tableWidgetTransactions->setColumnWidth(3, 120);  // Sender
+    ui->tableWidgetTransactions->setColumnWidth(4, 120);  // Recipient
+    ui->tableWidgetTransactions->setColumnWidth(5, 100);  // Status
+    ui->tableWidgetTransactions->setColumnWidth(6, 80);   // Type
     
-    // Make table read-only
     ui->tableWidgetTransactions->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetTransactions->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidgetTransactions->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -55,80 +65,63 @@ void TransactionsHistoryPage::setupTransactionTable()
 
 void TransactionsHistoryPage::setupRequestTable()
 {
-    // Configure table for payment requests
-    ui->tableWidgetTransactions->setColumnCount(6);
+    ui->tableWidgetTransactions->setColumnCount(7); // "ID", "Date", "Amount", "From", "To", "Message", "Status"
     ui->tableWidgetTransactions->setHorizontalHeaderLabels(
-        {"ID", "Date", "Amount", "From", "To", "Message"});
-    
-    // Set column widths (similar to transaction table)
+        {"ID", "Date", "Amount", "From", "To", "Message", "Status"}); // Plan.md section 2.4
+
+    // Set column widths (adjust as needed)
     ui->tableWidgetTransactions->setColumnWidth(0, 50);   // ID
     ui->tableWidgetTransactions->setColumnWidth(1, 150);  // Date
     ui->tableWidgetTransactions->setColumnWidth(2, 100);  // Amount
-    ui->tableWidgetTransactions->setColumnWidth(3, 150);  // From
-    ui->tableWidgetTransactions->setColumnWidth(4, 150);  // To
-    ui->tableWidgetTransactions->setColumnWidth(5, 200);  // Message
+    ui->tableWidgetTransactions->setColumnWidth(3, 120);  // From
+    ui->tableWidgetTransactions->setColumnWidth(4, 120);  // To
+    ui->tableWidgetTransactions->setColumnWidth(5, 180);  // Message
+    ui->tableWidgetTransactions->setColumnWidth(6, 100);  // Status
+
+    ui->tableWidgetTransactions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidgetTransactions->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidgetTransactions->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableWidgetTransactions->horizontalHeader()->setStretchLastSection(true);
 }
 
 void TransactionsHistoryPage::clearTable()
 {
-    ui->tableWidgetTransactions->setRowCount(0);
-}
-
-void TransactionsHistoryPage::displayRecentTransactions()
-{
-    if (!m_currentUser) {
-        return;
-    }
-    
-    // Set the view to transactions
-    setupTransactionTable();
-    clearTable();
-    
-    // Get user's completed transactions
-    std::vector<Transaction*> transactions = m_currentUser->getHistoryTransactions();
-	std::cout << "Number of transactions: " << transactions.size() << std::endl;
-    // Show the most recent 3 transactions (or all if less than 3)
-    int count = std::min(3, static_cast<int>(transactions.size()));
-    
-    // If we have transactions in reverse chronological order (newest first)
-    for (int i = 0; i < count; i++) {
-        Transaction* transaction = transactions[transactions.size() - 1 - i]; // Start from the end for newest first
-        addTransactionToTable(transaction);
-    }
-    
-    // Update title based on what we're showing
-    ui->labelTitle->setText("Recent Transactions");
+    ui->tableWidgetTransactions->setRowCount(0); // Plan.md section 2.4
 }
 
 void TransactionsHistoryPage::addTransactionToTable(Transaction* transaction)
 {
+    if (!transaction || !m_currentUser) return; // Basic safety check
+
     int row = ui->tableWidgetTransactions->rowCount();
     ui->tableWidgetTransactions->insertRow(row);
-    
-    // Convert time_t to readable date format
-    QDateTime dateTime;
-    dateTime.setSecsSinceEpoch(transaction->getDate());
-    QString dateString = dateTime.toString("yyyy-MM-dd hh:mm:ss");
-    
-    // Set the data for this row
+
+    // ID
     ui->tableWidgetTransactions->setItem(row, 0, new QTableWidgetItem(QString::number(transaction->getId())));
-    ui->tableWidgetTransactions->setItem(row, 1, new QTableWidgetItem(dateString));
+    // Date
+    QDateTime dateTime = QDateTime::fromSecsSinceEpoch(transaction->getDate());
+    ui->tableWidgetTransactions->setItem(row, 1, new QTableWidgetItem(dateTime.toString("yyyy-MM-dd hh:mm:ss")));
+    // Amount
     ui->tableWidgetTransactions->setItem(row, 2, new QTableWidgetItem(QString::number(transaction->getAmount(), 'f', 2)));
+    // Sender
     ui->tableWidgetTransactions->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(transaction->getSender())));
+    // Recipient
     ui->tableWidgetTransactions->setItem(row, 4, new QTableWidgetItem(QString::fromStdString(transaction->getRecipient())));
+    // Status
     ui->tableWidgetTransactions->setItem(row, 5, new QTableWidgetItem(QString::fromStdString(transaction->getStatus())));
-    
-    // Color-code the row based on transaction type
+    // Type
+    ui->tableWidgetTransactions->setItem(row, 6, new QTableWidgetItem(QString::fromStdString(transaction->getType())));
+
+    // Color-coding (Plan.md section 2.4)
     QColor rowColor;
     if (transaction->getSender() == m_currentUser->getUsername()) {
-        // Outgoing transaction (sent) - light red
-        rowColor = QColor(255, 235, 235);
+        rowColor = QColor(255, 235, 235); // Light red for outgoing
+    } else if (transaction->getRecipient() == m_currentUser->getUsername()) {
+        rowColor = QColor(235, 255, 235); // Light green for incoming
     } else {
-        // Incoming transaction (received) - light green
-        rowColor = QColor(235, 255, 235);
+        rowColor = Qt::white; // Default or for transactions not directly involving the user (e.g. admin view)
     }
-    
-    // Apply color to all cells in the row
+
     for (int col = 0; col < ui->tableWidgetTransactions->columnCount(); ++col) {
         if (ui->tableWidgetTransactions->item(row, col)) {
             ui->tableWidgetTransactions->item(row, col)->setBackground(rowColor);
@@ -136,118 +129,146 @@ void TransactionsHistoryPage::addTransactionToTable(Transaction* transaction)
     }
 }
 
-void TransactionsHistoryPage::addRequestToTable(const PaymentRequest& request)
+void TransactionsHistoryPage::addRequestToTable(const PaymentRequest& request) // Plan.md section 2.4
 {
+    if (!m_currentUser) return;
+
     int row = ui->tableWidgetTransactions->rowCount();
     ui->tableWidgetTransactions->insertRow(row);
-    
-    // Convert time_t to readable date format
-    QDateTime dateTime;
-    dateTime.setSecsSinceEpoch(request.getDate());
-    QString dateString = dateTime.toString("yyyy-MM-dd hh:mm:ss");
-    
-    // Set the data for this row
+
+    // ID
     ui->tableWidgetTransactions->setItem(row, 0, new QTableWidgetItem(QString::number(request.getId())));
-    ui->tableWidgetTransactions->setItem(row, 1, new QTableWidgetItem(dateString));
+    // Date
+    QDateTime dateTime = QDateTime::fromSecsSinceEpoch(request.getDate());
+    ui->tableWidgetTransactions->setItem(row, 1, new QTableWidgetItem(dateTime.toString("yyyy-MM-dd hh:mm:ss")));
+    // Amount
     ui->tableWidgetTransactions->setItem(row, 2, new QTableWidgetItem(QString::number(request.getAmount(), 'f', 2)));
+    // From (Sender)
     ui->tableWidgetTransactions->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(request.getSender())));
+    // To (Recipient)
     ui->tableWidgetTransactions->setItem(row, 4, new QTableWidgetItem(QString::fromStdString(request.getRecipient())));
+    // Message
     ui->tableWidgetTransactions->setItem(row, 5, new QTableWidgetItem(QString::fromStdString(request.getMessage())));
+    // Status
+    ui->tableWidgetTransactions->setItem(row, 6, new QTableWidgetItem(QString::fromStdString(request.getStatus())));
+
+    // Color-coding (similar logic can be applied if needed for requests)
+    QColor rowColor;
+    if (request.getSender() == m_currentUser->getUsername()) {
+        rowColor = QColor(255, 245, 235); // Light orange for outgoing requests
+    } else if (request.getRecipient() == m_currentUser->getUsername()) {
+        rowColor = QColor(235, 245, 255); // Light blue for incoming requests
+    } else {
+        rowColor = Qt::white;
+    }
+
+    for (int col = 0; col < ui->tableWidgetTransactions->columnCount(); ++col) {
+        if (ui->tableWidgetTransactions->item(row, col)) {
+            ui->tableWidgetTransactions->item(row, col)->setBackground(rowColor);
+        }
+    }
 }
 
-void TransactionsHistoryPage::showAllTransactions()
+void TransactionsHistoryPage::displayRecentTransactions() // Plan.md section 2.5
 {
     if (!m_currentUser) {
+        clearTable();
+        ui->labelTitle->setText("No user data to display recent transactions.");
         return;
     }
-    
-    // Set the view to transactions
+
     setupTransactionTable();
     clearTable();
-    
-    // Get all user's completed transactions
+
     std::vector<Transaction*> transactions = m_currentUser->getHistoryTransactions();
     
-    // If we have transactions in reverse chronological order (newest first)
-    for (int i = transactions.size() - 1; i >= 0; i--) {
+    // Sort transactions by date in descending order (newest first)
+    std::sort(transactions.begin(), transactions.end(), [](const Transaction* a, const Transaction* b) {
+        return a->getDate() > b->getDate();
+    });
+
+    int count = std::min(static_cast<int>(transactions.size()), 5); // Display up to 5 recent transactions
+    for (int i = 0; i < count; ++i) {
         addTransactionToTable(transactions[i]);
     }
-    
-    // Update title
+
+    ui->labelTitle->setText("Recent Transactions");
+}
+
+
+void TransactionsHistoryPage::on_pushButtonViewAllTransactions_clicked() // Plan.md section 2.5 & 4.8
+{
+    if (!m_currentUser) {
+        QMessageBox::warning(this, "No User", "No user data loaded. Cannot display transactions.");
+        return;
+    }
+
+    setupTransactionTable();
+    clearTable();
+
+    std::vector<Transaction*> transactions = m_currentUser->getHistoryTransactions();
+
+    // Sort transactions by date in descending order (newest first)
+    std::sort(transactions.begin(), transactions.end(), [](const Transaction* a, const Transaction* b) {
+        return a->getDate() > b->getDate(); // Newest first
+    });
+
+    for (Transaction* transaction : transactions) {
+        addTransactionToTable(transaction);
+    }
+
     ui->labelTitle->setText("All Completed Transactions");
 }
 
-void TransactionsHistoryPage::showIncomingRequests()
+void TransactionsHistoryPage::on_pushButtonViewIncomingRequests_clicked() // Plan.md section 2.5
 {
     if (!m_currentUser) {
+        QMessageBox::warning(this, "No User", "No user data loaded. Cannot display incoming requests.");
         return;
     }
-    
-    // Set the view to payment requests
+
     setupRequestTable();
     clearTable();
     
-    // Get user's pending incoming requests
-    std::vector<PaymentRequest> incomingRequests = m_currentUser->getPendingIncomingRequests();
-    
-    // Display all incoming requests
-    for (const auto& request : incomingRequests) {
+    std::vector<PaymentRequest> requests = m_currentUser->getPendingIncomingRequests();
+
+    // Sort requests by date (e.g., newest first)
+    std::sort(requests.begin(), requests.end(), [](const PaymentRequest& a, const PaymentRequest& b) {
+        return a.getDate() > b.getDate();
+    });
+
+    for (const auto& request : requests) {
         addRequestToTable(request);
     }
-    
-    // Update title
+
     ui->labelTitle->setText("Pending Incoming Payment Requests");
 }
 
-void TransactionsHistoryPage::showOutgoingRequests()
+void TransactionsHistoryPage::on_pushButtonViewOutgoingRequests_clicked() // Plan.md section 2.5
 {
     if (!m_currentUser) {
+        QMessageBox::warning(this, "No User", "No user data loaded. Cannot display outgoing requests.");
         return;
     }
-    
-    // Set the view to payment requests
+
     setupRequestTable();
     clearTable();
-    
-    // Get user's pending outgoing requests
-    std::vector<PaymentRequest> outgoingRequests = m_currentUser->getPendingOutgoingRequests();
-    
-    // Display all outgoing requests
-    for (const auto& request : outgoingRequests) {
+
+    std::vector<PaymentRequest> requests = m_currentUser->getPendingOutgoingRequests();
+
+    // Sort requests by date (e.g., newest first)
+    std::sort(requests.begin(), requests.end(), [](const PaymentRequest& a, const PaymentRequest& b) {
+        return a.getDate() > b.getDate();
+    });
+
+    for (const auto& request : requests) {
         addRequestToTable(request);
     }
-    
-    // Update title
+
     ui->labelTitle->setText("Pending Outgoing Payment Requests");
 }
 
-void TransactionsHistoryPage::on_pushButtonBackToHome_clicked()
+void TransactionsHistoryPage::on_pushButtonBackToHome_clicked() // Plan.md section 2.5
 {
     emit navigateToHomeRequested();
 }
-
-void TransactionsHistoryPage::on_pushButtonViewAllTransactions_clicked()
-{
-    showAllTransactions();
-}
-
-void TransactionsHistoryPage::on_pushButtonViewIncomingRequests_clicked()
-{
-    showIncomingRequests();
-}
-
-void TransactionsHistoryPage::on_pushButtonViewOutgoingRequests_clicked()
-{
-    showOutgoingRequests();
-}
-// The errors are caused because `labelTitle` and `tableWidgetTransactions` are not members of the `Ui::TransactionsHistoryPage` class.
-// This usually means that these widgets do not exist in your .ui file (designed in Qt Designer), or they are named differently there.
-// To fix this:
-// 1. Open your TransactionsHistoryPage.ui file in Qt Designer.
-// 2. Make sure you have a QLabel named `labelTitle` and a QTableWidget named `tableWidgetTransactions`.
-// 3. If they do not exist, add them and set their objectName properties to exactly `labelTitle` and `tableWidgetTransactions`.
-// 4. Save the .ui file and re-run qmake/CMake and rebuild your project so the generated ui_TransactionsHistoryPage.h is updated.
-// 5. If the names are different, either rename them in the .ui file or update your C++ code to use the correct names.
-
-// Example: In Qt Designer, select the table widget and set its objectName to "tableWidgetTransactions" in the Property Editor.
-// Do the same for the label, setting its objectName to "labelTitle".

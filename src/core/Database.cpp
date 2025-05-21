@@ -126,10 +126,49 @@ Database::Database() {
                 transactions.push_back(transaction);
             }
         }
+
         myfile.close();
         fileReadSuccess = true;
     }
+myfile.open(filePath + "pendingOutgoingRequests.txt", std::ios::in);
+    if (myfile) {
+        std::string line;
+        while (std::getline(myfile, line)) {
+            std::istringstream iss(line);
+            int id;
+            double amount;
+            std::string sender, recipient, message;
+            if (!(iss >> id >> amount >> sender >> recipient)) {
+                throw std::runtime_error("Not enough parameters in pendingIncomingRequests.txt");
+            }
+            
+            // Try to read message, if not present use empty string
+            if (!(iss >> message)) {
+                message = "";
+            }
 
+            auto recipientAcc = accounts.find(recipient);
+            if (recipientAcc != accounts.end() && recipientAcc->second->getAccountType() == "User") {
+                User* userAccount = dynamic_cast<User*>(recipientAcc->second);
+                if (userAccount) {
+                    userAccount->addPendingIncomingRequest(PaymentRequest(id, amount, sender, recipient, "pending", message));
+                }
+            }
+            else {
+                throw std::runtime_error("Recipient account not found or not a user");
+            }
+            auto senderAcc = accounts.find(sender);
+            if (senderAcc != accounts.end() && senderAcc->second->getAccountType() == "User") {
+                User* userAccount = dynamic_cast<User*>(senderAcc->second);
+                if (userAccount) {
+                    userAccount->addPendingOutgoingRequest(PaymentRequest(id, amount, sender, recipient, "pending", message));
+                }
+            }
+            else {
+                throw std::runtime_error("Sender account not found or not a user");
+            }
+        }
+    }
 }
 
 Database::~Database() {

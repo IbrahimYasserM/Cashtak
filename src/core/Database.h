@@ -24,7 +24,7 @@ private:
 	User* user = nullptr;
 	Admin* admin = nullptr;
 	std::string filePath;
-	std::vector<std::string> fileNames = { "Admins.txt", "Users.txt","CompletedTransactions.txt" };
+	std::vector<std::string> fileNames = { "Admins.txt", "Users.txt","CompletedTransactions.txt", "pendingOutgoingRequests.txt" };
 
 public:
 	~Database();
