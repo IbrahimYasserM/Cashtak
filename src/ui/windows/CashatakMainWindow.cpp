@@ -99,7 +99,6 @@ void CashatakMainWindow::handleLoginSuccess(Account* account)
         // If account is a User, set their balance
         if (m_currentAccount->getAccountType() == "User") {
             User* user = dynamic_cast<User*>(m_currentAccount);
-            m_homePage->setUserBalance(QString::asprintf("$%.2f", user->getBalance()));
 
             QHBoxLayout* headerLayout = new QHBoxLayout();
             QLabel* username = new QLabel(user->getUsername().c_str(), this);
@@ -156,6 +155,8 @@ void CashatakMainWindow::navigateToRegister()
 
 void CashatakMainWindow::navigateToHome()
 {
+
+    m_homePage->setUserBalance(QString::asprintf("$%.2f", dynamic_cast<User*>(Database::getInstance()->getCurrentAccount())->getBalance()));
     m_stackedWidget->setCurrentWidget(m_homePage);
 }
 
