@@ -8,7 +8,7 @@
 class LoginPage;
 class RegisterPage;
 class HomePage;
-class SendPaymentRequestPage;
+class RequestMoney;
 class SendMoneyPage;
 class TransactionsHistoryPage;
 class AdminPage;
@@ -38,7 +38,7 @@ private:
     LoginPage *m_loginPage;
     RegisterPage *m_registerPage;
     HomePage *m_homePage;
-    SendPaymentRequestPage *m_sendPaymentRequestPage;
+    RequestMoney *m_requestMoneyPage;
     SendMoneyPage *m_sendMoneyPage;
     TransactionsHistoryPage *m_transactionsHistoryPage;
     AdminPage *m_adminPage;

@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <algorithm> // For std::remove_if
 
 using namespace std;
 
@@ -45,6 +46,8 @@ public:
     void sendMoney(Transaction* sendMoney);
     void addPendingIncomingRequest(PaymentRequest request);
     void addPendingOutgoingRequest(PaymentRequest request);
+    bool removePendingIncomingRequest(int requestId); // Added for Phase 2
+    bool removePendingOutgoingRequest(int requestId); // Added for Phase 2
 	void addTransaction(Transaction* transaction);
     void addNotificationTransaction(Transaction* transaction);
     void addNotificationRequest(PaymentRequest* request);

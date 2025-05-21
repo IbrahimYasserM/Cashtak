@@ -1,43 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SendMoneyPage</class>
- <widget class="QWidget" name="SendMoneyPage">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>300</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Send Money</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Send Money Page</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButtonBackToHome">
-     <property name="text">
-      <string>Back to Home</string>
-     </property>
-    </widget>
-   </item>
-  </layout>
- </widget>
- <resources/>
- <connections/>
-</ui> 
+	<class>SendMoneyPage</class>
+	<widget class="QWidget" name="SendMoneyPage">
+		<property name="geometry">
+			<rect>
+				<x>0</x>
+				<y>0</y>
+				<width>500</width>
+				<height>400</height>
+			</rect>
+		</property>
+		<property name="windowTitle">
+			<string>Send Money</string>
+		</property>
+		<layout class="QVBoxLayout" name="verticalLayout">
+			<item>
+				<widget class="QLabel" name="label">
+					<property name="font">
+						<font>
+							<pointsize>16</pointsize>
+						</font>
+					</property>
+					<property name="text">
+						<string>Send Money</string>
+					</property>
+					<property name="alignment">
+						<set>Qt::AlignCenter</set>
+					</property>
+				</widget>
+			</item>
+			<item>
+				<layout class="QFormLayout" name="formLayout">
+					<item row="0" column="0">
+						<widget class="QLabel" name="labelRecipient">
+							<property name="text">
+								<string>Recipient Username:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="0" column="1">
+						<widget class="QLineEdit" name="lineEditRecipient"/>
+					</item>
+					<item row="1" column="0">
+						<widget class="QLabel" name="labelAmount">
+							<property name="text">
+								<string>Amount:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="1" column="1">
+						<widget class="QDoubleSpinBox" name="doubleSpinBoxAmount">
+							<property name="minimum">
+								<double>0.010000000000000</double>
+							</property>
+							<property name="maximum">
+								<double>1000000.000000000000000</double>
+							</property>
+						</widget>
+					</item>
+					<item row="2" column="0">
+						<widget class="QLabel" name="labelBalance">
+							<property name="text">
+								<string>Your Balance:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="2" column="1">
+						<widget class="QLabel" name="labelBalanceValue">
+							<property name="text">
+								<string>0.00</string>
+							</property>
+						</widget>
+					</item>
+				</layout>
+			</item>
+			<item>
+				<widget class="QLabel" name="labelStatus">
+					<property name="text">
+						<string/>
+					</property>
+					<property name="alignment">
+						<set>Qt::AlignCenter</set>
+					</property>
+				</widget>
+			</item>
+			<item>
+				<widget class="QPushButton" name="pushButtonSend">
+					<property name="text">
+						<string>Send Money</string>
+					</property>
+				</widget>
+			</item>
+			<item>
+				<widget class="QPushButton" name="pushButtonBackToHome">
+					<property name="text">
+						<string>Back to Home</string>
+					</property>
+				</widget>
+			</item>
+		</layout>
+	</widget>
+	<resources/>
+	<connections/>
+</ui>

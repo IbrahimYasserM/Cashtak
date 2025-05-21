@@ -6,6 +6,7 @@
 #include "PaymentRequest.h"
 #include "Transaction.h"
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -18,7 +19,7 @@ private:
 	Database& operator=(const Database&) = delete;
 	static Database* database;
 	std::fstream myfile;
-	std::map<std::string, Account*> accounts;
+	std::unordered_map<std::string, Account*> accounts;
 	std::vector<Transaction*> transactions;
 	User* user = nullptr;
 	Admin* admin = nullptr;
@@ -37,6 +38,6 @@ public:
 	Account* getAccount(const std::string  username);
 	Transaction* getTransaction(int id);
 	void setCurrentAccount(Account* account);
-	const std::map<std::string, Account*>& getAccounts() const { return accounts; }
+	const std::unordered_map<std::string, Account*>& getAccounts() const { return accounts; }
 };
 
