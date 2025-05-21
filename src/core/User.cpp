@@ -1,5 +1,6 @@
 #include <stdafx.h>
 #include "User.h"
+#include <iostream>
 
 // Initialize the static account ID counter
 long long User::accountIdCounter = 1;
@@ -83,7 +84,7 @@ void User::sendMoney(Transaction* sendMoney) {
         completedTransactions.push_back(sendMoney);
     }
     else {
-        //cout << "Insufficient balance to send money." << endl;
+		std::cout << "Insufficient balance." << std::endl;
     }
 }
 void User::addPendingIncomingRequest(PaymentRequest request) {
