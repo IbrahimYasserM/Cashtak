@@ -1,6 +1,7 @@
 #include <stdafx.h>
 #include "User.h"
 #include <iostream>
+#include <algorithm> // Ensure this is included for std::remove_if
 
 // Initialize the static account ID counter
 long long User::accountIdCounter = 1;
@@ -102,5 +103,28 @@ void User::addNotificationTransaction(Transaction* transaction) {
 void User::addNotificationRequest(PaymentRequest* request) {
     notifications.push(Notification(request));
 }
+
+bool User::removePendingIncomingRequest(int requestId) { // Added for Phase 2
+    auto original_size = pendingIncomingRequests.size();
+    pendingIncomingRequests.erase(
+        std::remove_if(pendingIncomingRequests.begin(), pendingIncomingRequests.end(),
+                       [requestId](const PaymentRequest& req) {
+                           return req.getId() == requestId;
+                       }),
+        pendingIncomingRequests.end());
+    return pendingIncomingRequests.size() < original_size;
+}
+
+bool User::removePendingOutgoingRequest(int requestId) { // Added for Phase 2
+    auto original_size = pendingOutgoingRequests.size();
+    pendingOutgoingRequests.erase(
+        std::remove_if(pendingOutgoingRequests.begin(), pendingOutgoingRequests.end(),
+                       [requestId](const PaymentRequest& req) {
+                           return req.getId() == requestId;
+                       }),
+        pendingOutgoingRequests.end());
+    return pendingOutgoingRequests.size() < original_size;
+}
+
 // Destructor
 User::~User() = default;

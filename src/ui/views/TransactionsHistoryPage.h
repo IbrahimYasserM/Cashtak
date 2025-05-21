@@ -33,10 +33,15 @@ private slots:
     void on_pushButtonViewIncomingRequests_clicked();
     void on_pushButtonViewOutgoingRequests_clicked();
     void on_pushButtonBackToHome_clicked();
+    // Added for Phase 1 of Accept/Decline plan
+    void handleAcceptRequest(int requestId);
+    void handleDeclineRequest(int requestId);
 
 private:
     Ui::TransactionsHistoryPage *ui;
     User* m_currentUser;
+    // Assuming Database instance is retrieved globally or passed if needed for Phases 3 & 4
+    // For now, it's not a member here. Will be Database::getInstance() in slots.
 
     void setupTransactionTable();
     void setupRequestTable(); 
