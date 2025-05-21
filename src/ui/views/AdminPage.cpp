@@ -3,6 +3,7 @@
 #include "ui_AdminPage.h"
 #include <QMessageBox>
 #include <QInputDialog>
+#include "../dialogs/TransactionsDialog.h"
 
 AdminPage::AdminPage(QWidget *parent) :
     QWidget(parent),
@@ -37,9 +38,13 @@ void AdminPage::refreshUserTable()
         ui->tableWidgetUsers->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(user->getUsername())));
         ui->tableWidgetUsers->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(user->getEmail())));
         ui->tableWidgetUsers->setItem(row, 2, new QTableWidgetItem(QString::number(user->getBalance())));
-        
-        // Add status column
         ui->tableWidgetUsers->setItem(row, 3, new QTableWidgetItem(QString::fromStdString(user->getStatusString())));
+        
+        // Add transactions button in the last column
+        QPushButton* transButton = new QPushButton("Transactions", this);
+        transButton->setProperty("username", QString::fromStdString(user->getUsername()));
+        connect(transButton, &QPushButton::clicked, this, &AdminPage::on_userTransactionButtonClicked);
+        ui->tableWidgetUsers->setCellWidget(row, 4, transButton);
     }
 
     ui->tableWidgetUsers->resizeColumnsToContents();
@@ -277,5 +282,32 @@ void AdminPage::on_pushButtonToggleStatus_clicked()
         } else {
             QMessageBox::warning(this, "Error", "Failed to change user status.");
         }
+    }
+}
+
+void AdminPage::on_pushButtonViewAllTransactions_clicked()
+{
+    if (admin) {
+        std::vector<Transaction*> allTransactions = admin->getAllTransactions();
+        TransactionsDialog dialog(allTransactions, "All Transactions", this);
+        dialog.exec();
+    } else {
+        QMessageBox::warning(this, "Error", "Admin account required to view transactions.");
+    }
+}
+
+void AdminPage::on_userTransactionButtonClicked()
+{
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    if (!button) return;
+    
+    QString username = button->property("username").toString();
+    
+    if (admin && !username.isEmpty()) {
+        std::vector<Transaction*> userTransactions = admin->getUserTransactions(username.toStdString());
+        TransactionsDialog dialog(userTransactions, 
+                                "Transactions for " + username, 
+                                this);
+        dialog.exec();
     }
 }

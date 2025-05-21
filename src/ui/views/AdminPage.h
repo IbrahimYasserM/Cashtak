@@ -10,6 +10,7 @@
 #include "../../core/User.h"
 #include "../../core/Admin.h"
 #include "../../core/Database.h"
+#include "../dialogs/TransactionsDialog.h"
 
 namespace Ui {
 class AdminPage;
@@ -37,6 +38,8 @@ private slots:
     void on_pushButtonToggleStatus_clicked(); // New slot for toggling status
     void on_pushButtonDeleteUser_clicked();
     void on_pushButtonAddUser_clicked();
+    void on_pushButtonViewAllTransactions_clicked();
+    void on_userTransactionButtonClicked();
 
 private:
     Ui::AdminPage *ui;
@@ -47,4 +50,5 @@ private:
     void loadUsers();
     void searchUsers(const QString& searchTerm);
     std::vector<std::string> getAllUsernames();
+    void setupUserTransactionButtons();
 };

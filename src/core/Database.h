@@ -38,5 +38,7 @@ public:
 	Transaction* getTransaction(int id);
 	void setCurrentAccount(Account* account);
 	const std::map<std::string, Account*>& getAccounts() const { return accounts; }
+	const std::vector<Transaction*>& getAllTransactions() const { return transactions; }
+	const std::vector<Transaction*>& getTransactions() const { return transactions; }
 };
 

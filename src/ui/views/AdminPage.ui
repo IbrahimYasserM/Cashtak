@@ -86,6 +86,11 @@
            <string>Status</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>Actions</string>
+          </property>
+         </column>
         </widget>
        </item>
        <item>
@@ -122,6 +127,13 @@
           <widget class="QPushButton" name="pushButtonAddUser">
            <property name="text">
             <string>Add User</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonViewAllTransactions">
+           <property name="text">
+            <string>View All Transactions</string>
            </property>
           </widget>
          </item>

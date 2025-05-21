@@ -121,3 +121,27 @@ bool Admin::toggleUserStatus(User* user)
         return false;
     }
 }
+
+std::vector<Transaction*> Admin::getAllTransactions() const
+{
+    Database* db = Database::getInstance();
+    return db->getTransactions();
+}
+
+std::vector<Transaction*> Admin::getUserTransactions(const std::string& username) const
+{
+    std::vector<Transaction*> userTransactions;
+    Database* db = Database::getInstance();
+    
+    // Get all transactions
+    std::vector<Transaction*> allTransactions = db->getTransactions();
+    
+    // Filter transactions for the specific user
+    for (auto& transaction : allTransactions) {
+        if (transaction->getSender() == username || transaction->getRecipient() == username) {
+            userTransactions.push_back(transaction);
+        }
+    }
+    
+    return userTransactions;
+}

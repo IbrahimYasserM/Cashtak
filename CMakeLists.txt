@@ -24,6 +24,7 @@ add_executable(Cashatak)
 file(GLOB CORE_SOURCES       LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/core/*.cpp")
 file(GLOB UI_WINDOWS_SOURCES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/windows/*.cpp")
 file(GLOB UI_VIEWS_SOURCES   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/views/*.cpp")
+file(GLOB UI_DIALOGS_SOURCES LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/dialogs/*.cpp")
 # According to README.md, you might have sources in src/app/ and its subdirectories:
 # file(GLOB APP_CORE_SOURCES      LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/*.cpp")
 # file(GLOB APP_SERVICES_SOURCES  LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/services/*.cpp")
@@ -38,6 +39,7 @@ set(PROJECT_SOURCES
     ${CORE_SOURCES}
     ${UI_WINDOWS_SOURCES}
     ${UI_VIEWS_SOURCES}
+    ${UI_DIALOGS_SOURCES}
     # ${APP_CORE_SOURCES}
     # ${APP_SERVICES_SOURCES}
     # ${APP_UTILS_SOURCES}
@@ -48,6 +50,7 @@ set(PROJECT_SOURCES
 file(GLOB CORE_HEADERS       LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/core/*.h")
 file(GLOB UI_WINDOWS_HEADERS LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/windows/*.h")
 file(GLOB UI_VIEWS_HEADERS   LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/views/*.h")
+file(GLOB UI_DIALOGS_HEADERS LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/ui/dialogs/*.h")
 # According to README.md, you might have headers in src/app/ and its subdirectories:
 # file(GLOB APP_CORE_HEADERS      LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/*.h")
 # file(GLOB APP_SERVICES_HEADERS  LIST_DIRECTORIES false RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/app/services/*.h")
@@ -63,6 +66,7 @@ set(PROJECT_HEADERS
     ${CORE_HEADERS}
     ${UI_WINDOWS_HEADERS}
     ${UI_VIEWS_HEADERS}
+    ${UI_DIALOGS_HEADERS}
     # ${APP_CORE_HEADERS}
     # ${APP_SERVICES_HEADERS}
     # ${APP_UTILS_HEADERS}
@@ -107,8 +111,9 @@ target_include_directories(Cashatak PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/core
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/windows
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/views
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/dialogs
     ${CMAKE_CURRENT_SOURCE_DIR}/src/resources
 )
 
 # Optional: If you want to install the application
-# install(TARGETS Cashatak DESTINATION bin) 
+# install(TARGETS Cashatak DESTINATION bin)
