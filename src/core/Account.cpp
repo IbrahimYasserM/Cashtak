@@ -1,18 +1,16 @@
 #include "stdafx.h"
 #include "Account.h"
+#include "../picosha2.h"
 #include <string>
-#include <sstream>
 using namespace std;
-
 
 // Hashing function for password - simple hex conversion
 string Account::hashPassword(const string& password)
 {
-    stringstream ss;
-    for (char c : password) {
-        ss << hex << static_cast<int>(c);
-    }
-    return ss.str();
+    std::string hash = "34abcdefghijFGHIJKLMNOPQRSTUVWXYZ056yzABCDE" + password + "7klmnopqrstuvwx1289";
+    for (int i = 0; i < 170; ++i)
+        hash = picosha2::hash256_hex_string(hash);
+    return hash;
 }
 
 

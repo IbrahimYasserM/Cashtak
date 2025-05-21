@@ -38,6 +38,9 @@ public:
 	Account* getAccount(const std::string  username);
 	Transaction* getTransaction(int id);
 	void setCurrentAccount(Account* account);
+
+	const std::vector<Transaction*>& getAllTransactions() const { return transactions; }
+	const std::vector<Transaction*>& getTransactions() const { return transactions; }
 	const std::unordered_map<std::string, Account*>& getAccounts() const { return accounts; }
 };
 

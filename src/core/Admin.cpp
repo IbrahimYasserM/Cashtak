@@ -2,8 +2,8 @@
 #include "Admin.h"
 #include "User.h"
 #include "Event.h"
-#include "Database.h" // Add Database.h include
-#include <iostream>   // Add iostream for std::cerr
+#include "Database.h"
+#include <iostream>
 
 using namespace std;
 
@@ -21,20 +21,22 @@ Admin::~Admin()
 {
 }
 
-std::vector<User*> Admin::ViewUsers() const
+std::vector<User*> Admin::getAllUsers() const
 {
-    // In a real implementation, this would query the database for all users
-    vector<User*> users;
-    //cout << "Admin viewing all users" << endl;
+    // Get all users from the database
+    std::vector<User*> users;
+    Database* db = Database::getInstance();
+    
+    for (const auto& [username, account] : db->getAccounts()) {
+        if (account && account->getAccountType() == "User") {
+            User* user = dynamic_cast<User*>(account);
+            if (user) {
+                users.push_back(user);
+            }
+        }
+    }
+    
     return users;
-}
-
-std::vector<Event*> Admin::ViewEvents() const
-{
-    // In a real implementation, this would query the database for all events
-    vector<Event*> events;
-    //cout << "Admin viewing all events" << endl;
-    return events;
 }
 
 bool Admin::EditBalance(User* user, double newBalance)
@@ -43,7 +45,7 @@ bool Admin::EditBalance(User* user, double newBalance)
         return false;
         
     try {
-        // Actually update the user's balance
+        // Update the user's balance
         user->setBalanceDirectly(newBalance);
         return true;
     } catch (const std::exception& e) {
@@ -56,10 +58,18 @@ bool Admin::deleteUser(User* user)
 {
     if (!user)
         return false;
+    
+    try {
+        // Get database instance
+        Database* db = Database::getInstance();
         
-    // In a real implementation, this would delete the user from the database
-    //cout << "Admin deleting user: " << user->getUsername() << endl;
-    return true;
+        // Remove the user from the database
+        db->removeAccount(user->getUsername());
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error deleting user: " << e.what() << std::endl;
+        return false;
+    }
 }
 
 bool Admin::addUser(const string& username, const string& email, 
@@ -70,7 +80,7 @@ bool Admin::addUser(const string& username, const string& email,
         return false;
     }
     
-    // Check if username already exists in database
+    // Check if username already exists
     Database* db = Database::getInstance();
     if (db->getAccount(username) != nullptr) {
         return false; // Username already exists
@@ -88,10 +98,50 @@ bool Admin::addUser(const string& username, const string& email,
             return true;
         }
     } catch (const std::exception& e) {
-        // Log the error
         std::cerr << "Error adding user: " << e.what() << std::endl;
         return false;
     }
     
     return false;
+}
+
+bool Admin::toggleUserStatus(User* user)
+{
+    if (!user)
+        return false;
+        
+    try {
+        // Toggle the status between ACTIVE and SUSPENDED
+        AccountStatus newStatus = (user->getStatus() == AccountStatus::ACTIVE) ? 
+                               AccountStatus::SUSPENDED : AccountStatus::ACTIVE;
+        user->setStatus(newStatus);
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error toggling user status: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+std::vector<Transaction*> Admin::getAllTransactions() const
+{
+    Database* db = Database::getInstance();
+    return db->getTransactions();
+}
+
+std::vector<Transaction*> Admin::getUserTransactions(const std::string& username) const
+{
+    std::vector<Transaction*> userTransactions;
+    Database* db = Database::getInstance();
+    
+    // Get all transactions
+    std::vector<Transaction*> allTransactions = db->getTransactions();
+    
+    // Filter transactions for the specific user
+    for (auto& transaction : allTransactions) {
+        if (transaction->getSender() == username || transaction->getRecipient() == username) {
+            userTransactions.push_back(transaction);
+        }
+    }
+    
+    return userTransactions;
 }
